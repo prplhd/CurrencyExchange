@@ -7,7 +7,7 @@ import ru.prplhd.currencyexchange.mapper.CurrencyMapper;
 import java.util.List;
 
 public class CurrencyService {
-    CurrencyDao currencyDao;
+    private final CurrencyDao currencyDao;
 
     public CurrencyService(CurrencyDao dao) {
         currencyDao = dao;
