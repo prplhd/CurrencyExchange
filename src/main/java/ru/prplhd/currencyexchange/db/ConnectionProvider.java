@@ -41,7 +41,7 @@ public final class ConnectionProvider {
         try {
             return DriverManager.getConnection(URL);
         } catch (SQLException e) {
-            throw new IllegalStateException("Unable to connect to database." + e);
+            throw new IllegalStateException("Unable to connect to database.", e);
         }
     }
 }
