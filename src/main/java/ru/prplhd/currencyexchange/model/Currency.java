@@ -1,10 +1,10 @@
 package ru.prplhd.currencyexchange.model;
 
 public class Currency {
-    Long id;
-    String code;
-    String fullName;
-    String sign;
+    private Long id;
+    private String code;
+    private String fullName;
+    private String sign;
 
 
     public Currency(Long id, String code, String fullName, String sign) {
