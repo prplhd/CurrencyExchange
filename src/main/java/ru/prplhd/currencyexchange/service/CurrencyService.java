@@ -14,8 +14,6 @@ public class CurrencyService {
     }
 
     public List<CurrencyDto> getAllCurrencies() {
-        return currencyDao.findAll().stream()
-                .map(CurrencyMapper::toDto)
-                .toList();
+        return CurrencyMapper.toDtos(currencyDao.findAll());
     }
 }

@@ -21,9 +21,9 @@ public class CurrencyDao {
             while (resultSet.next()) {
                 Long id = resultSet.getLong("id");
                 String code = resultSet.getString("code");
-                String fullName = resultSet.getString("fullname");
+                String name = resultSet.getString("fullname");
                 String sign = resultSet.getString("sign");
-                Currency currency = new Currency(id, code, fullName, sign);
+                Currency currency = new Currency(id, code, name, sign);
                 currencies.add(currency);
             }
 
