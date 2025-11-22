@@ -14,7 +14,6 @@ import ru.prplhd.currencyexchange.exception.DataAccessException;
 import ru.prplhd.currencyexchange.service.CurrencyService;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 @WebServlet("/currencies")
 public class CurrenciesServlet extends HttpServlet {

@@ -2,7 +2,6 @@ package ru.prplhd.currencyexchange.mapper;
 
 import ru.prplhd.currencyexchange.dto.CurrencyDto;
 import ru.prplhd.currencyexchange.model.Currency;
-
 import java.util.List;
 
 public final class CurrencyMapper {
