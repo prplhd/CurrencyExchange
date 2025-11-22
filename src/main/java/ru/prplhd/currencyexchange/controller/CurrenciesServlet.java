@@ -11,7 +11,9 @@ import ru.prplhd.currencyexchange.dao.CurrencyDao;
 import ru.prplhd.currencyexchange.dto.CurrencyDto;
 import ru.prplhd.currencyexchange.service.CurrencyService;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet("/currencies")
 public class CurrenciesServlet extends HttpServlet {
@@ -30,9 +32,13 @@ public class CurrenciesServlet extends HttpServlet {
         resp.setContentType("application/json;charset=UTF-8");
         resp.setStatus(HttpServletResponse.SC_OK);
 
-        List<CurrencyDto> currencyDtos = currencyService.getAllCurrencies();
-        String json = GSON.toJson(currencyDtos);
-
-        resp.getWriter().write(json);
+        try {
+            List<CurrencyDto> currencyDtos = currencyService.getAllCurrencies();
+           GSON.toJson(currencyDtos,  resp.getWriter());
+        } catch (IllegalStateException e) {
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            Map<String, String> error = Map.of("message", e.getMessage());
+            GSON.toJson(error, resp.getWriter());
+        }
     }
 }
