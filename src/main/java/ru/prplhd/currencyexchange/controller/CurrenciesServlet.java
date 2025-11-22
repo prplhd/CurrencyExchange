@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ru.prplhd.currencyexchange.dao.CurrencyDao;
 import ru.prplhd.currencyexchange.dto.CurrencyDto;
+import ru.prplhd.currencyexchange.dto.ErrorMessageDto;
 import ru.prplhd.currencyexchange.exception.DataAccessException;
 import ru.prplhd.currencyexchange.service.CurrencyService;
 import java.io.IOException;
@@ -37,8 +38,8 @@ public class CurrenciesServlet extends HttpServlet {
            GSON.toJson(currencyDtos,  resp.getWriter());
         } catch (DataAccessException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            Map<String, String> error = Map.of("message", e.getMessage());
-            GSON.toJson(error, resp.getWriter());
+            ErrorMessageDto errorMessageDto = new ErrorMessageDto("Internal server error");
+            GSON.toJson(errorMessageDto, resp.getWriter());
         }
     }
 }
