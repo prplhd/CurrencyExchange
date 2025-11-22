@@ -1,5 +1,6 @@
 package ru.prplhd.currencyexchange.db;
 
+import ru.prplhd.currencyexchange.exception.DataAccessException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -30,10 +31,10 @@ public final class ConnectionProvider {
 
             Class.forName(driver);
         } catch (IOException e) {
-            throw new IllegalStateException("Failed to load database configuration from "
+            throw new DataAccessException("Failed to load database configuration from "
                     + PROPERTIES_FILE, e);
         } catch (ClassNotFoundException e) {
-            throw new IllegalStateException("JDBC driver class not found.", e);
+            throw new DataAccessException("JDBC driver class not found.", e);
         }
     }
 
@@ -41,7 +42,7 @@ public final class ConnectionProvider {
         try {
             return DriverManager.getConnection(URL);
         } catch (SQLException e) {
-            throw new IllegalStateException("Unable to connect to database.", e);
+            throw new DataAccessException("Unable to connect to database.", e);
         }
     }
 }

@@ -1,6 +1,7 @@
 package ru.prplhd.currencyexchange.dao;
 
 import ru.prplhd.currencyexchange.db.ConnectionProvider;
+import ru.prplhd.currencyexchange.exception.DataAccessException;
 import ru.prplhd.currencyexchange.model.Currency;
 
 import java.sql.*;
@@ -8,12 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CurrencyDao {
+    private static final String FIND_ALL_CURRENCIES_SQL = "SELECT id, code, fullname, sign FROM CURRENCIES";
+
     public List<Currency> findAll() {
         try (Connection connection = ConnectionProvider.getConnection();
              Statement statement = connection.createStatement()) {
 
-            String selectSql = "SELECT id, code, fullname, sign FROM currencies";
-            ResultSet resultSet = statement.executeQuery(selectSql);
+            ResultSet resultSet = statement.executeQuery(FIND_ALL_CURRENCIES_SQL);
             List<Currency> currencies = new ArrayList<>();
 
             while (resultSet.next()) {
@@ -27,7 +29,7 @@ public class CurrencyDao {
 
             return currencies;
         } catch (SQLException e) {
-            throw new IllegalStateException("Failed to load currencies from database", e);
+            throw new DataAccessException("Failed to load currencies from database", e);
         }
     }
 }
