@@ -1,6 +1,5 @@
 package ru.prplhd.currencyexchange.controller;
 
-import com.google.gson.Gson;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -12,12 +11,13 @@ import ru.prplhd.currencyexchange.dto.CurrencyDto;
 import ru.prplhd.currencyexchange.dto.ErrorMessageDto;
 import ru.prplhd.currencyexchange.exception.DataAccessException;
 import ru.prplhd.currencyexchange.service.CurrencyService;
+import ru.prplhd.currencyexchange.utils.JsonResponseWriter;
+
 import java.io.IOException;
 import java.util.List;
 
 @WebServlet("/currencies")
 public class CurrenciesServlet extends HttpServlet {
-    private static final Gson GSON = new Gson();
     private CurrencyService currencyService;
 
     @Override
@@ -28,17 +28,14 @@ public class CurrenciesServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json;charset=UTF-8");
-
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             List<CurrencyDto> currencyDtos = currencyService.getAllCurrencies();
-            resp.setStatus(HttpServletResponse.SC_OK);
-           GSON.toJson(currencyDtos,  resp.getWriter());
+            JsonResponseWriter.write(currencyDtos, response, HttpServletResponse.SC_OK);
         } catch (DataAccessException e) {
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             ErrorMessageDto errorMessageDto = new ErrorMessageDto("Failed to load currencies. Please try again later.");
-            GSON.toJson(errorMessageDto, resp.getWriter());
+            JsonResponseWriter.write(errorMessageDto, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
         }
     }
 }
