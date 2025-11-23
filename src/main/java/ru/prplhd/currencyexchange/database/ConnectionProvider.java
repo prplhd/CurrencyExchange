@@ -1,4 +1,4 @@
-package ru.prplhd.currencyexchange.db;
+package ru.prplhd.currencyexchange.database;
 
 import ru.prplhd.currencyexchange.exception.DataAccessException;
 import java.io.IOException;
@@ -21,9 +21,6 @@ public final class ConnectionProvider {
         try (InputStream inputStream = ConnectionProvider.class.getClassLoader()
                 .getResourceAsStream(PROPERTIES_FILE)) {
 
-            if (inputStream == null) {
-                initializationErrorMessage = PROPERTIES_FILE + " not found in classpath";
-            }
             Properties properties = new Properties();
             properties.load(inputStream);
             String driver = properties.getProperty(DRIVER_KEY);

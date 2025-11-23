@@ -1,6 +1,6 @@
 package ru.prplhd.currencyexchange.dao;
 
-import ru.prplhd.currencyexchange.db.ConnectionProvider;
+import ru.prplhd.currencyexchange.database.ConnectionProvider;
 import ru.prplhd.currencyexchange.exception.DataAccessException;
 import ru.prplhd.currencyexchange.model.Currency;
 import java.sql.Connection;
