@@ -30,14 +30,14 @@ public class CurrenciesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json;charset=UTF-8");
-        resp.setStatus(HttpServletResponse.SC_OK);
 
         try {
             List<CurrencyDto> currencyDtos = currencyService.getAllCurrencies();
+            resp.setStatus(HttpServletResponse.SC_OK);
            GSON.toJson(currencyDtos,  resp.getWriter());
         } catch (DataAccessException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            ErrorMessageDto errorMessageDto = new ErrorMessageDto("Internal server error");
+            ErrorMessageDto errorMessageDto = new ErrorMessageDto("Failed to load currencies. Please try again later.");
             GSON.toJson(errorMessageDto, resp.getWriter());
         }
     }
