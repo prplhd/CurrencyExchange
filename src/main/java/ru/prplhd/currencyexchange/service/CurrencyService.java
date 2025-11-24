@@ -48,7 +48,7 @@ public class CurrencyService {
         }
 
         String sign = createCurrencyDto.sign();
-        if (sign != null && sign.length() != 1) {
+        if (sign != null && sign.length() > 3) {
             throw new ValidationException("Invalid sign length. When provided, currency sign must consist of exactly 1 character.");
         }
     }
