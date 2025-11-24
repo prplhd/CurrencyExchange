@@ -1,6 +1,7 @@
 package ru.prplhd.currencyexchange.service;
 
 import ru.prplhd.currencyexchange.dao.CurrencyDao;
+import ru.prplhd.currencyexchange.dto.CreateCurrencyDto;
 import ru.prplhd.currencyexchange.dto.CurrencyDto;
 import ru.prplhd.currencyexchange.exception.CurrencyNotFoundException;
 import ru.prplhd.currencyexchange.mapper.CurrencyMapper;
@@ -25,5 +26,9 @@ public class CurrencyService {
 
     public List<CurrencyDto> getAllCurrencies() {
         return CurrencyMapper.toDtos(currencyDao.findAll());
+    }
+
+    public CurrencyDto createCurrency(CreateCurrencyDto createCurrencyDto) {
+        return null;
     }
 }
