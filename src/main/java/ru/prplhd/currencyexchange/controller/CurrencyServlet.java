@@ -39,7 +39,7 @@ public class CurrencyServlet extends HttpServlet {
 
         String code = path.substring(1).trim().toUpperCase(Locale.ROOT);
         if (!code.matches("[A-Z]{3}")) {
-            ErrorMessageDto errorMessageDto = new ErrorMessageDto("Invalid format. Currency code must be 3 uppercase letters");
+            ErrorMessageDto errorMessageDto = new ErrorMessageDto("Invalid format. Currency code must consist of 3 English letters.");
             JsonResponseWriter.write(errorMessageDto, response, HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
@@ -47,9 +47,11 @@ public class CurrencyServlet extends HttpServlet {
         try {
             CurrencyDto currencyDto = currencyService.getCurrencyByCode(code);
             JsonResponseWriter.write(currencyDto, response, HttpServletResponse.SC_OK);
+
         } catch (CurrencyNotFoundException e) {
             ErrorMessageDto errorMessageDto = new ErrorMessageDto(e.getMessage());
             JsonResponseWriter.write(errorMessageDto, response, HttpServletResponse.SC_NOT_FOUND);
+
         } catch (DataAccessException e) {
             ErrorMessageDto errorMessageDto = new ErrorMessageDto("Failed to load currency. Please try again later.");
             JsonResponseWriter.write(errorMessageDto, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

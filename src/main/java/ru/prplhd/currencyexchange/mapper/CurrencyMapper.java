@@ -1,5 +1,6 @@
 package ru.prplhd.currencyexchange.mapper;
 
+import ru.prplhd.currencyexchange.dto.CreateCurrencyDto;
 import ru.prplhd.currencyexchange.dto.CurrencyDto;
 import ru.prplhd.currencyexchange.model.Currency;
 import java.util.List;
@@ -20,5 +21,14 @@ public final class CurrencyMapper {
         return currencies.stream()
                 .map(CurrencyMapper::toDto)
                 .toList();
+    }
+
+    public static Currency fromCreateDto(CreateCurrencyDto dto) {
+        return new Currency(
+                null,
+                dto.code(),
+                dto.name(),
+                dto.sign()
+        );
     }
 }

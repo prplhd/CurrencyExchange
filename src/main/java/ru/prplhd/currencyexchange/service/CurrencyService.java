@@ -4,9 +4,9 @@ import ru.prplhd.currencyexchange.dao.CurrencyDao;
 import ru.prplhd.currencyexchange.dto.CreateCurrencyDto;
 import ru.prplhd.currencyexchange.dto.CurrencyDto;
 import ru.prplhd.currencyexchange.exception.CurrencyNotFoundException;
+import ru.prplhd.currencyexchange.exception.ValidationException;
 import ru.prplhd.currencyexchange.mapper.CurrencyMapper;
 import ru.prplhd.currencyexchange.model.Currency;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -25,10 +25,31 @@ public class CurrencyService {
     }
 
     public List<CurrencyDto> getAllCurrencies() {
-        return CurrencyMapper.toDtos(currencyDao.findAll());
+        List<Currency> currencies = currencyDao.findAll();
+        return CurrencyMapper.toDtos(currencies);
     }
 
     public CurrencyDto createCurrency(CreateCurrencyDto createCurrencyDto) {
-        return null;
+        validateCreateCurrencyDto(createCurrencyDto);
+        Currency currencyToSave = CurrencyMapper.fromCreateDto(createCurrencyDto);
+        Currency savedCurrency = currencyDao.insert(currencyToSave);
+        return CurrencyMapper.toDto(savedCurrency);
+    }
+
+    private void validateCreateCurrencyDto(CreateCurrencyDto createCurrencyDto) {
+        String code = createCurrencyDto.code();
+        if (!code.matches("[A-Z]{3}")) {
+            throw new ValidationException("Invalid format. Currency code must consist of 3 uppercase English letters.");
+        }
+
+        String name = createCurrencyDto.name();
+        if (name.length() < 3 || name.length() > 50) {
+            throw new ValidationException("Invalid name length. Currency name must be between 3 and 50 characters.");
+        }
+
+        String sign = createCurrencyDto.sign();
+        if (sign != null && sign.length() != 1) {
+            throw new ValidationException("Invalid sign length. When provided, currency sign must consist of exactly 1 character.");
+        }
     }
 }
