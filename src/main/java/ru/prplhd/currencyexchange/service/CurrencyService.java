@@ -14,7 +14,7 @@ public class CurrencyService {
     private final CurrencyDao currencyDao;
 
     public CurrencyService(CurrencyDao dao) {
-        currencyDao = dao;
+        this.currencyDao = dao;
     }
 
     public CurrencyDto getCurrencyByCode(String code) {

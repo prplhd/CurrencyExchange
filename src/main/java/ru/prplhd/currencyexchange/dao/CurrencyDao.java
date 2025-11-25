@@ -29,7 +29,6 @@ public class CurrencyDao {
                     Currency currency = mapToCurrency(resultSet);
                     currencies.add(currency);
                 }
-
                 return currencies;
             }
         } catch (SQLException e) {
