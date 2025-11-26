@@ -71,11 +71,13 @@ public class CurrenciesServlet extends HttpServlet {
         if (name == null || name.isBlank()) {
             throw new BadRequestException("Missing or empty required parameter 'name'");
         }
+        name = name.trim();
 
         String code = request.getParameter("code");
         if (code == null || code.isBlank()) {
             throw new BadRequestException("Missing or empty required parameter 'code'");
         }
+        code = code.trim().toUpperCase(Locale.ROOT);
 
         String sign = request.getParameter("sign");
         if (sign != null) {
@@ -85,6 +87,6 @@ public class CurrenciesServlet extends HttpServlet {
             }
         }
 
-        return new CreateCurrencyDto(name.trim(), code.trim().toUpperCase(Locale.ROOT), sign);
+        return new CreateCurrencyDto(name, code, sign);
     }
 }
