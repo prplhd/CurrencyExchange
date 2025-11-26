@@ -14,9 +14,18 @@ import java.util.List;
 import java.util.Optional;
 
 public class CurrencyDao {
-    private static final String FIND_ALL_CURRENCIES_SQL = "SELECT id, code, fullname, sign FROM currencies";
-    private static final String FIND_CURRENCY_BY_CODE_SQL = "SELECT id, code, fullname, sign FROM currencies WHERE code = ?";
-    private static final String INSERT_CURRENCY_SQL = "INSERT INTO currencies (code, fullname, sign) VALUES (?, ?, ?)";
+    private static final String FIND_ALL_CURRENCIES_SQL = """
+            SELECT id, code, fullname, sign
+            FROM currencies
+            """;
+    private static final String FIND_CURRENCY_BY_CODE_SQL = """
+            SELECT id, code, fullname, sign
+            FROM currencies WHERE code = ?
+            """;
+    private static final String INSERT_CURRENCY_SQL = """
+            INSERT INTO currencies (code, fullname, sign)
+            VALUES (?, ?, ?)
+            """;
 
     public List<Currency> findAll() {
         try (Connection connection = ConnectionProvider.getConnection();
