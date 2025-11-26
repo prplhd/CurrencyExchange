@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.Optional;
 
 public class CurrencyService {
+    private static final String CURRENCY_CODE_REGEX = "[A-Z]{3}";
+    private static final int MIN_CURRENCY_NAME_LENGTH = 3;
+    private static final int MAX_CURRENCY_NAME_LENGTH = 50;
+    private static final int MAX_CURRENCY_SIGN_LENGTH = 3;
     private final CurrencyDao currencyDao;
 
     public CurrencyService(CurrencyDao dao) {
@@ -38,18 +42,18 @@ public class CurrencyService {
 
     private void validateCreateCurrencyDto(CreateCurrencyDto createCurrencyDto) {
         String code = createCurrencyDto.code();
-        if (!code.matches("[A-Z]{3}")) {
+        if (!code.matches(CURRENCY_CODE_REGEX)) {
             throw new ValidationException("Invalid format. Currency code must consist of 3 uppercase English letters.");
         }
 
         String name = createCurrencyDto.name();
-        if (name.length() < 3 || name.length() > 50) {
+        if (name.length() < MIN_CURRENCY_NAME_LENGTH || name.length() > MAX_CURRENCY_NAME_LENGTH) {
             throw new ValidationException("Invalid name length. Currency name must be between 3 and 50 characters.");
         }
 
         String sign = createCurrencyDto.sign();
-        if (sign != null && sign.length() > 3) {
-            throw new ValidationException("Invalid sign length. When provided, currency sign must consist of exactly 1 character.");
+        if (sign != null && sign.length() > MAX_CURRENCY_SIGN_LENGTH) {
+            throw new ValidationException("Invalid sign length. When provided, currency sign must not be longer than 3 characters.");
         }
     }
 }
