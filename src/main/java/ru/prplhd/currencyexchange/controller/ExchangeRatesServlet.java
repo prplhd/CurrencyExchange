@@ -16,7 +16,7 @@ import ru.prplhd.currencyexchange.exception.DataAccessException;
 import ru.prplhd.currencyexchange.exception.ExchangeRateAlreadyExistsException;
 import ru.prplhd.currencyexchange.exception.ValidationException;
 import ru.prplhd.currencyexchange.service.ExchangeRateService;
-import ru.prplhd.currencyexchange.utils.JsonResponseWriter;
+import ru.prplhd.currencyexchange.util.JsonResponseWriter;
 
 import java.io.IOException;
 import java.util.List;
@@ -37,11 +37,18 @@ public class ExchangeRatesServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             List<ExchangeRateDto> exchangeRateDtos = exchangeRateService.getAllExchangeRates();
-            JsonResponseWriter.write(exchangeRateDtos, response, HttpServletResponse.SC_OK);
+            JsonResponseWriter.write(
+                    exchangeRateDtos,
+                    response,
+                    HttpServletResponse.SC_OK
+            );
 
         } catch (DataAccessException e) {
-            ErrorMessageDto errorMessageDto = new ErrorMessageDto("Failed to load exchange rates. Please try again later.");
-            JsonResponseWriter.write(errorMessageDto, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            JsonResponseWriter.write(
+                    new ErrorMessageDto("Failed to load exchange rates. Please try again later."),
+                    response,
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR
+            );
         }
     }
 
@@ -50,23 +57,37 @@ public class ExchangeRatesServlet extends HttpServlet {
         try {
             CreateExchangeRateDto createExchangeRateDto = createExchangeRateDto(request);
             ExchangeRateDto exchangeRateDto = exchangeRateService.createExchangeRate(createExchangeRateDto);
-            JsonResponseWriter.write(exchangeRateDto, response, HttpServletResponse.SC_CREATED);
+            JsonResponseWriter.write(
+                    exchangeRateDto,
+                    response,
+                    HttpServletResponse.SC_CREATED);
 
         } catch (BadRequestException | ValidationException e) {
-            ErrorMessageDto errorMessageDto = new ErrorMessageDto(e.getMessage());
-            JsonResponseWriter.write(errorMessageDto, response, HttpServletResponse.SC_BAD_REQUEST);
+            JsonResponseWriter.write(
+                    new ErrorMessageDto(e.getMessage()),
+                    response,
+                    HttpServletResponse.SC_BAD_REQUEST
+            );
 
         } catch (CurrencyNotFoundException e) {
-            ErrorMessageDto errorMessageDto = new ErrorMessageDto(e.getMessage());
-            JsonResponseWriter.write(errorMessageDto, response, HttpServletResponse.SC_NOT_FOUND);
+            JsonResponseWriter.write(new ErrorMessageDto(
+                    e.getMessage()),
+                    response,
+                    HttpServletResponse.SC_NOT_FOUND);
 
         } catch (ExchangeRateAlreadyExistsException e) {
-            ErrorMessageDto errorMessageDto = new ErrorMessageDto(e.getMessage());
-            JsonResponseWriter.write(errorMessageDto, response, HttpServletResponse.SC_CONFLICT);
+            JsonResponseWriter.write(
+                    new ErrorMessageDto(e.getMessage()),
+                    response,
+                    HttpServletResponse.SC_CONFLICT
+            );
 
         } catch (DataAccessException e) {
-            ErrorMessageDto errorMessageDto = new ErrorMessageDto("Failed to create exchange rate. Please try again later.");
-            JsonResponseWriter.write(errorMessageDto, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            JsonResponseWriter.write(
+                    new ErrorMessageDto("Failed to create exchange rate. Please try again later."),
+                    response,
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR
+            );
         }
     }
 

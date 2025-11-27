@@ -13,7 +13,7 @@ import ru.prplhd.currencyexchange.exception.CurrencyNotFoundException;
 import ru.prplhd.currencyexchange.exception.DataAccessException;
 import ru.prplhd.currencyexchange.exception.ValidationException;
 import ru.prplhd.currencyexchange.service.CurrencyService;
-import ru.prplhd.currencyexchange.utils.JsonResponseWriter;
+import ru.prplhd.currencyexchange.util.JsonResponseWriter;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -41,19 +41,31 @@ public class CurrencyServlet extends HttpServlet {
 
         try {
             CurrencyDto currencyDto = currencyService.getCurrencyByCode(code);
-            JsonResponseWriter.write(currencyDto, response, HttpServletResponse.SC_OK);
+            JsonResponseWriter.write(
+                    currencyDto,
+                    response,
+                    HttpServletResponse.SC_OK
+            );
 
         } catch (ValidationException e) {
-            ErrorMessageDto errorMessageDto = new ErrorMessageDto(e.getMessage());
-            JsonResponseWriter.write(errorMessageDto, response, HttpServletResponse.SC_BAD_REQUEST);
+            JsonResponseWriter.write(
+                    new ErrorMessageDto(e.getMessage()),
+                    response,
+                    HttpServletResponse.SC_BAD_REQUEST
+            );
 
         } catch (CurrencyNotFoundException e) {
-            ErrorMessageDto errorMessageDto = new ErrorMessageDto(e.getMessage());
-            JsonResponseWriter.write(errorMessageDto, response, HttpServletResponse.SC_NOT_FOUND);
+            JsonResponseWriter.write(
+                    new ErrorMessageDto(e.getMessage()),
+                    response,
+                    HttpServletResponse.SC_NOT_FOUND
+            );
 
         } catch (DataAccessException e) {
-            ErrorMessageDto errorMessageDto = new ErrorMessageDto("Failed to load currency. Please try again later.");
-            JsonResponseWriter.write(errorMessageDto, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            JsonResponseWriter.write(new ErrorMessageDto("Failed to load currency. Please try again later."),
+                    response,
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR
+            );
         }
     }
 }
