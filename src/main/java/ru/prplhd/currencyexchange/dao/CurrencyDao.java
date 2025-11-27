@@ -2,6 +2,7 @@ package ru.prplhd.currencyexchange.dao;
 
 import ru.prplhd.currencyexchange.database.ConnectionProvider;
 import ru.prplhd.currencyexchange.exception.CurrencyAlreadyExistsException;
+import ru.prplhd.currencyexchange.exception.CurrencyNotFoundException;
 import ru.prplhd.currencyexchange.exception.DataAccessException;
 import ru.prplhd.currencyexchange.model.Currency;
 import java.sql.Connection;
@@ -45,16 +46,17 @@ public class CurrencyDao {
         }
     }
 
-    public Optional<Currency> findByCode(String code) {
+    public Currency findByCode(String code) {
         try (Connection connection = ConnectionProvider.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_CURRENCY_BY_CODE_SQL)) {
 
             preparedStatement.setString(1, code);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    return Optional.of(mapToCurrency(resultSet));
+                    return mapToCurrency(resultSet);
+                } else {
+                    throw new CurrencyNotFoundException("Currency with code '%s' not found".formatted(code));
                 }
-                return Optional.empty();
             }
         } catch (SQLException e) {
             throw new DataAccessException("Failed to load currencies from database", e);
@@ -69,7 +71,7 @@ public class CurrencyDao {
             preparedStatement.setString(2, currencyToInsert.name());
             preparedStatement.setString(3, currencyToInsert.sign());
             int rowsAffected = preparedStatement.executeUpdate();
-            if (rowsAffected != 1) {
+            if (rowsAffected == 0) {
                 throw new DataAccessException("Failed to insert currency into database");
             }
 

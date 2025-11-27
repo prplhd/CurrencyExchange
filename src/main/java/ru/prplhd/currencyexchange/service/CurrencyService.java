@@ -22,9 +22,7 @@ public class CurrencyService {
     }
 
     public CurrencyDto getCurrencyByCode(String code) {
-        Optional<Currency> optCurrency = currencyDao.findByCode(code);
-        Currency currency = optCurrency.orElseThrow(() ->
-                new CurrencyNotFoundException("Currency with code '%s' not found".formatted(code)));
+        Currency currency = currencyDao.findByCode(code);
         return CurrencyMapper.toDto(currency);
     }
 
