@@ -11,6 +11,7 @@ import ru.prplhd.currencyexchange.dto.CurrencyDto;
 import ru.prplhd.currencyexchange.dto.ErrorMessageDto;
 import ru.prplhd.currencyexchange.exception.CurrencyNotFoundException;
 import ru.prplhd.currencyexchange.exception.DataAccessException;
+import ru.prplhd.currencyexchange.exception.ValidationException;
 import ru.prplhd.currencyexchange.service.CurrencyService;
 import ru.prplhd.currencyexchange.utils.JsonResponseWriter;
 
@@ -36,17 +37,15 @@ public class CurrencyServlet extends HttpServlet {
             JsonResponseWriter.write(errorMessageDto, response, HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-
         String code = path.substring(1).trim().toUpperCase(Locale.ROOT);
-        if (!code.matches("[A-Z]{3}")) {
-            ErrorMessageDto errorMessageDto = new ErrorMessageDto("Invalid format. Currency code must consist of 3 English letters.");
-            JsonResponseWriter.write(errorMessageDto, response, HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
 
         try {
             CurrencyDto currencyDto = currencyService.getCurrencyByCode(code);
             JsonResponseWriter.write(currencyDto, response, HttpServletResponse.SC_OK);
+
+        } catch (ValidationException e) {
+            ErrorMessageDto errorMessageDto = new ErrorMessageDto(e.getMessage());
+            JsonResponseWriter.write(errorMessageDto, response, HttpServletResponse.SC_BAD_REQUEST);
 
         } catch (CurrencyNotFoundException e) {
             ErrorMessageDto errorMessageDto = new ErrorMessageDto(e.getMessage());
