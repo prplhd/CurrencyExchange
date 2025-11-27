@@ -7,14 +7,20 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ru.prplhd.currencyexchange.dao.ExchangeRateDao;
+import ru.prplhd.currencyexchange.dto.CreateExchangeRateDto;
 import ru.prplhd.currencyexchange.dto.ErrorMessageDto;
 import ru.prplhd.currencyexchange.dto.ExchangeRateDto;
+import ru.prplhd.currencyexchange.exception.BadRequestException;
+import ru.prplhd.currencyexchange.exception.CurrencyNotFoundException;
 import ru.prplhd.currencyexchange.exception.DataAccessException;
+import ru.prplhd.currencyexchange.exception.ExchangeRateAlreadyExistsException;
+import ru.prplhd.currencyexchange.exception.ValidationException;
 import ru.prplhd.currencyexchange.service.ExchangeRateService;
 import ru.prplhd.currencyexchange.utils.JsonResponseWriter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 @WebServlet("/exchangeRates")
 public class ExchangeRatesServlet extends HttpServlet {
@@ -37,5 +43,52 @@ public class ExchangeRatesServlet extends HttpServlet {
             ErrorMessageDto errorMessageDto = new ErrorMessageDto("Failed to load exchange rates. Please try again later.");
             JsonResponseWriter.write(errorMessageDto, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            CreateExchangeRateDto createExchangeRateDto = createExchangeRateDto(request);
+            ExchangeRateDto exchangeRateDto = exchangeRateService.createExchangeRate(createExchangeRateDto);
+            JsonResponseWriter.write(exchangeRateDto, response, HttpServletResponse.SC_CREATED);
+
+        } catch (BadRequestException | ValidationException e) {
+            ErrorMessageDto errorMessageDto = new ErrorMessageDto(e.getMessage());
+            JsonResponseWriter.write(errorMessageDto, response, HttpServletResponse.SC_BAD_REQUEST);
+
+        } catch (CurrencyNotFoundException e) {
+            ErrorMessageDto errorMessageDto = new ErrorMessageDto(e.getMessage());
+            JsonResponseWriter.write(errorMessageDto, response, HttpServletResponse.SC_NOT_FOUND);
+
+        } catch (ExchangeRateAlreadyExistsException e) {
+            ErrorMessageDto errorMessageDto = new ErrorMessageDto(e.getMessage());
+            JsonResponseWriter.write(errorMessageDto, response, HttpServletResponse.SC_CONFLICT);
+
+        } catch (DataAccessException e) {
+            ErrorMessageDto errorMessageDto = new ErrorMessageDto("Failed to create exchange rate. Please try again later.");
+            JsonResponseWriter.write(errorMessageDto, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private CreateExchangeRateDto createExchangeRateDto(HttpServletRequest request) {
+        String baseCurrencyCode = request.getParameter("baseCurrencyCode");
+        if (baseCurrencyCode == null || baseCurrencyCode.isBlank()) {
+            throw new BadRequestException("Missing or empty required parameter 'baseCurrencyCode'");
+        }
+        baseCurrencyCode = baseCurrencyCode.trim().toUpperCase(Locale.ROOT);
+
+        String targetCurrencyCode = request.getParameter("targetCurrencyCode");
+        if (targetCurrencyCode == null || targetCurrencyCode.isBlank()) {
+            throw new BadRequestException("Missing or empty required parameter 'targetCurrencyCode'");
+        }
+        targetCurrencyCode = targetCurrencyCode.trim().toUpperCase(Locale.ROOT);
+
+        String rate = request.getParameter("rate");
+        if (rate == null || rate.isBlank()) {
+            throw new BadRequestException("Missing or empty required parameter 'rate'");
+        }
+        rate = rate.trim();
+
+        return new CreateExchangeRateDto(baseCurrencyCode, targetCurrencyCode, rate);
     }
 }
