@@ -6,43 +6,46 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ru.prplhd.currencyexchange.dao.CurrencyDao;
-import ru.prplhd.currencyexchange.dto.CurrencyDto;
+import ru.prplhd.currencyexchange.dao.ExchangeRateDao;
 import ru.prplhd.currencyexchange.dto.ErrorMessageDto;
-import ru.prplhd.currencyexchange.exception.CurrencyNotFoundException;
+import ru.prplhd.currencyexchange.dto.ExchangeRateDto;
 import ru.prplhd.currencyexchange.exception.DataAccessException;
+import ru.prplhd.currencyexchange.exception.ExchangeRateNotFoundException;
 import ru.prplhd.currencyexchange.exception.ValidationException;
-import ru.prplhd.currencyexchange.service.CurrencyService;
+import ru.prplhd.currencyexchange.service.ExchangeRateService;
 import ru.prplhd.currencyexchange.util.JsonResponseWriter;
 
 import java.io.IOException;
 import java.util.Locale;
 
-@WebServlet("/currency/*")
-public class CurrencyServlet extends HttpServlet {
-    private CurrencyService currencyService;
+@WebServlet("/exchangeRate/*")
+public class ExchangeRateServlet extends HttpServlet {
+    private ExchangeRateService exchangeRateService;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        CurrencyDao dao = new CurrencyDao();
-        currencyService = new CurrencyService(dao);
+        ExchangeRateDao exchangeRateDao = new ExchangeRateDao();
+        exchangeRateService = new ExchangeRateService(exchangeRateDao);
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String path = request.getPathInfo();
         if (path == null || path.equals("/")) {
-            ErrorMessageDto errorMessageDto = new ErrorMessageDto("Invalid currency path. Please use /currency/{CODE}");
-            JsonResponseWriter.write(errorMessageDto, response, HttpServletResponse.SC_BAD_REQUEST);
+            JsonResponseWriter.write(
+                    new ErrorMessageDto("Invalid currency path. Please use /currency/{CODE}{CODE}"),
+                    response,
+                    HttpServletResponse.SC_BAD_REQUEST
+            );
             return;
         }
-        String code = path.substring(1).trim().toUpperCase(Locale.ROOT);
+        String currencyPairCode = path.substring(1).trim().toUpperCase(Locale.ROOT);
 
         try {
-            CurrencyDto currencyDto = currencyService.getCurrencyByCode(code);
+            ExchangeRateDto exchangeRateDto = exchangeRateService.getByCurrencyPairCode(currencyPairCode);
             JsonResponseWriter.write(
-                    currencyDto,
+                    exchangeRateDto,
                     response,
                     HttpServletResponse.SC_OK
             );
@@ -54,7 +57,7 @@ public class CurrencyServlet extends HttpServlet {
                     HttpServletResponse.SC_BAD_REQUEST
             );
 
-        } catch (CurrencyNotFoundException e) {
+        } catch (ExchangeRateNotFoundException e) {
             JsonResponseWriter.write(
                     new ErrorMessageDto(e.getMessage()),
                     response,
@@ -63,7 +66,7 @@ public class CurrencyServlet extends HttpServlet {
 
         } catch (DataAccessException e) {
             JsonResponseWriter.write(
-                    new ErrorMessageDto("Failed to load currency. Please try again later."),
+                    new ErrorMessageDto("Failed to load exchange rate. Please try again later."),
                     response,
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR
             );

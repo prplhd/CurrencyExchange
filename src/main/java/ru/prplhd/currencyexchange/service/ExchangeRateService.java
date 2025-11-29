@@ -3,7 +3,6 @@ package ru.prplhd.currencyexchange.service;
 import ru.prplhd.currencyexchange.dao.ExchangeRateDao;
 import ru.prplhd.currencyexchange.dto.CreateExchangeRateDto;
 import ru.prplhd.currencyexchange.dto.ExchangeRateDto;
-import ru.prplhd.currencyexchange.exception.ValidationException;
 import ru.prplhd.currencyexchange.mapper.ExchangeRateMapper;
 import ru.prplhd.currencyexchange.model.ExchangeRate;
 import ru.prplhd.currencyexchange.validation.ExchangeRateValidator;
@@ -32,6 +31,15 @@ public class ExchangeRateService {
 
         ExchangeRate exchangeRate = exchangeRateDao.insert(baseCurrencyCode, targetCurrencyCode, rate);
 
+        return ExchangeRateMapper.toDto(exchangeRate);
+    }
+
+    public ExchangeRateDto getByCurrencyPairCode(String currencyPairCode) {
+        ExchangeRateValidator.validateCurrencyPairCode(currencyPairCode);
+
+        String baseCurrencyCode = currencyPairCode.substring(0, ExchangeRateValidator.CURRENCY_CODE_LENGTH);
+        String targetCurrencyCode = currencyPairCode.substring(ExchangeRateValidator.CURRENCY_CODE_LENGTH);
+        ExchangeRate exchangeRate = exchangeRateDao.findByCurrencyPairCode(baseCurrencyCode, targetCurrencyCode);
         return ExchangeRateMapper.toDto(exchangeRate);
     }
 }
