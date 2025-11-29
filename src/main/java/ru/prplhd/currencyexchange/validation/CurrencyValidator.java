@@ -20,7 +20,8 @@ public final class CurrencyValidator {
     public static void validateCreateCurrencyDto(CreateCurrencyDto createCurrencyDto) {
         String name = createCurrencyDto.name();
         if (name.length() < MIN_CURRENCY_NAME_LENGTH || name.length() > MAX_CURRENCY_NAME_LENGTH) {
-            throw new ValidationException("Invalid name length. Currency name must be between 3 and 50 characters.");
+            throw new ValidationException("Invalid name length. Currency name must be between %d and %d characters."
+                    .formatted(MIN_CURRENCY_NAME_LENGTH, MAX_CURRENCY_NAME_LENGTH));
         }
 
         String code = createCurrencyDto.code();
@@ -30,7 +31,8 @@ public final class CurrencyValidator {
 
         String sign = createCurrencyDto.sign();
         if (sign != null && sign.length() > MAX_CURRENCY_SIGN_LENGTH) {
-            throw new ValidationException("Invalid sign length. When provided, currency sign must not be longer than 3 characters.");
+            throw new ValidationException("Invalid sign length. When provided, currency sign must not be longer than %d characters."
+                    .formatted(MAX_CURRENCY_SIGN_LENGTH));
         }
     }
 }
