@@ -9,11 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import ru.prplhd.currencyexchange.dao.CurrencyDao;
 import ru.prplhd.currencyexchange.dto.CreateCurrencyDto;
 import ru.prplhd.currencyexchange.dto.CurrencyDto;
-import ru.prplhd.currencyexchange.dto.ErrorMessageDto;
 import ru.prplhd.currencyexchange.exception.BadRequestException;
-import ru.prplhd.currencyexchange.exception.CurrencyAlreadyExistsException;
-import ru.prplhd.currencyexchange.exception.DataAccessException;
-import ru.prplhd.currencyexchange.exception.ValidationException;
 import ru.prplhd.currencyexchange.service.CurrencyService;
 import ru.prplhd.currencyexchange.util.JsonResponseWriter;
 
@@ -34,49 +30,23 @@ public class CurrenciesServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try {
-            List<CurrencyDto> currencyDtos = currencyService.getAllCurrencies();
-            JsonResponseWriter.write(currencyDtos, response, HttpServletResponse.SC_OK);
-
-        } catch (DataAccessException e) {
-            ErrorMessageDto errorMessageDto = new ErrorMessageDto("Failed to load currencies. Please try again later.");
-            JsonResponseWriter.write(errorMessageDto, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-
-        }
+        List<CurrencyDto> currencyDtos = currencyService.getAllCurrencies();
+        JsonResponseWriter.write(
+                currencyDtos,
+                response,
+                HttpServletResponse.SC_OK
+        );
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try {
-            CreateCurrencyDto createCurrencyDto = createCurrencyDto(request);
-            CurrencyDto currencyDto = currencyService.createCurrency(createCurrencyDto);
-            JsonResponseWriter.write(
-                    currencyDto,
-                    response,
-                    HttpServletResponse.SC_CREATED
-            );
-
-        } catch (BadRequestException | ValidationException e) {
-            JsonResponseWriter.write(
-                    new ErrorMessageDto(e.getMessage()),
-                    response,
-                    HttpServletResponse.SC_BAD_REQUEST
-            );
-
-        } catch (CurrencyAlreadyExistsException e) {
-            JsonResponseWriter.write(
-                    new ErrorMessageDto(e.getMessage()),
-                    response,
-                    HttpServletResponse.SC_CONFLICT
-            );
-
-        } catch (DataAccessException e) {
-            JsonResponseWriter.write(
-                    new ErrorMessageDto("Failed to create currency. Please try again later."),
-                    response,
-                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR
-            );
-        }
+        CreateCurrencyDto createCurrencyDto = createCurrencyDto(request);
+        CurrencyDto currencyDto = currencyService.createCurrency(createCurrencyDto);
+        JsonResponseWriter.write(
+                currencyDto,
+                response,
+                HttpServletResponse.SC_CREATED
+        );
     }
 
     private CreateCurrencyDto createCurrencyDto(HttpServletRequest request) {
