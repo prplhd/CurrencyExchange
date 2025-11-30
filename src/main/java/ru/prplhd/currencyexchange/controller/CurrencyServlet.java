@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import ru.prplhd.currencyexchange.dao.CurrencyDao;
 import ru.prplhd.currencyexchange.dto.CurrencyDto;
 import ru.prplhd.currencyexchange.dto.ErrorMessageDto;
+import ru.prplhd.currencyexchange.exception.BadRequestException;
 import ru.prplhd.currencyexchange.exception.CurrencyNotFoundException;
 import ru.prplhd.currencyexchange.exception.DataAccessException;
 import ru.prplhd.currencyexchange.exception.ValidationException;
@@ -31,15 +32,8 @@ public class CurrencyServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String path = request.getPathInfo();
-        if (path == null || path.equals("/")) {
-            ErrorMessageDto errorMessageDto = new ErrorMessageDto("Invalid currency path. Please use /currency/{CODE}");
-            JsonResponseWriter.write(errorMessageDto, response, HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
-        String code = path.substring(1).trim().toUpperCase(Locale.ROOT);
-
         try {
+            String code = extractCurrencyCode(request);
             CurrencyDto currencyDto = currencyService.getCurrencyByCode(code);
             JsonResponseWriter.write(
                     currencyDto,
@@ -47,7 +41,7 @@ public class CurrencyServlet extends HttpServlet {
                     HttpServletResponse.SC_OK
             );
 
-        } catch (ValidationException e) {
+        } catch (BadRequestException | ValidationException e) {
             JsonResponseWriter.write(
                     new ErrorMessageDto(e.getMessage()),
                     response,
@@ -68,5 +62,13 @@ public class CurrencyServlet extends HttpServlet {
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR
             );
         }
+    }
+
+    private String extractCurrencyCode(HttpServletRequest request) {
+        String pathInfo = request.getPathInfo();
+        if (pathInfo == null || pathInfo.equals("/")) {
+            throw new BadRequestException("Invalid currency path. Please use /currency/{CODE}");
+        }
+        return pathInfo.substring(1).trim().toUpperCase(Locale.ROOT);
     }
 }

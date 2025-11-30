@@ -80,7 +80,7 @@ public class ExchangeRateDao {
                 if (resultSet.next()) {
                     return mapToExchangeRate(resultSet);
                 } else {
-                    throw new ExchangeRateNotFoundException("Exchange rate with codes '%s' abd '%s' not found"
+                    throw new ExchangeRateNotFoundException("Exchange rate with codes '%s' and '%s' not found"
                             .formatted(baseCurrencyCode, targetCurrencyCode));
                 }
             }
