@@ -4,6 +4,7 @@ import ru.prplhd.currencyexchange.dao.ExchangeRateDao;
 import ru.prplhd.currencyexchange.dto.CreateExchangeRateDto;
 import ru.prplhd.currencyexchange.dto.ExchangeRateDto;
 import ru.prplhd.currencyexchange.mapper.ExchangeRateMapper;
+import ru.prplhd.currencyexchange.model.CurrencyPair;
 import ru.prplhd.currencyexchange.model.ExchangeRate;
 import ru.prplhd.currencyexchange.validation.ExchangeRateValidator;
 
@@ -35,10 +36,10 @@ public class ExchangeRateService {
     }
 
     public ExchangeRateDto getByCurrencyPairCode(String currencyPairCode) {
-        ExchangeRateValidator.validateCurrencyPairCode(currencyPairCode);
+        CurrencyPair pair = ExchangeRateValidator.validateAndParseCurrencyPairCode(currencyPairCode);
 
-        String baseCurrencyCode = currencyPairCode.substring(0, ExchangeRateValidator.CURRENCY_CODE_LENGTH);
-        String targetCurrencyCode = currencyPairCode.substring(ExchangeRateValidator.CURRENCY_CODE_LENGTH);
+        String baseCurrencyCode = pair.baseCurrencyCode();
+        String targetCurrencyCode = pair.targetCurrencyCode();
 
         ExchangeRate exchangeRate = exchangeRateDao.findByCurrencyPairCode(baseCurrencyCode, targetCurrencyCode);
         return ExchangeRateMapper.toDto(exchangeRate);

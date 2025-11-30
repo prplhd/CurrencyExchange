@@ -5,6 +5,7 @@ import ru.prplhd.currencyexchange.exception.ValidationException;
 
 public final class CurrencyValidator {
     private static final String CURRENCY_CODE_REGEX = "[A-Z]{3}";
+
     private static final int MIN_CURRENCY_NAME_LENGTH = 3;
     private static final int MAX_CURRENCY_NAME_LENGTH = 50;
     private static final int MAX_CURRENCY_SIGN_LENGTH = 3;

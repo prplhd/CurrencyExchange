@@ -2,11 +2,12 @@ package ru.prplhd.currencyexchange.validation;
 
 import ru.prplhd.currencyexchange.dto.CreateExchangeRateDto;
 import ru.prplhd.currencyexchange.exception.ValidationException;
+import ru.prplhd.currencyexchange.model.CurrencyPair;
 
 import java.math.BigDecimal;
 
 public final class ExchangeRateValidator {
-    public static final int CURRENCY_CODE_LENGTH = 3;
+    private static final int CURRENCY_CODE_LENGTH = 3;
     private static final int CURRENCY_PAIR_CODE_LENGTH = CURRENCY_CODE_LENGTH * 2;
 
     private static final int MAX_RATE_FRACTIONAL_PART_DIGITS = 6;
@@ -14,7 +15,7 @@ public final class ExchangeRateValidator {
 
     private ExchangeRateValidator() {}
 
-    public static void validateCurrencyPairCode(String currencyPairCode) {
+    public static CurrencyPair validateAndParseCurrencyPairCode(String currencyPairCode) {
         if (currencyPairCode.length() != CURRENCY_PAIR_CODE_LENGTH) {
             throw new ValidationException("Invalid format. Currency pair code must consist of exactly 6 uppercase English letters.");
         }
@@ -28,6 +29,8 @@ public final class ExchangeRateValidator {
         if (baseCurrencyCode.equals(targetCurrencyCode)) {
             throw new ValidationException("Invalid currency pair. Base and target currency codes must be different.");
         }
+
+        return new CurrencyPair(baseCurrencyCode, targetCurrencyCode);
     }
 
     public static void validateCreateExchangeRateDto(CreateExchangeRateDto createExchangeRateDto) {
