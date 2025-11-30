@@ -39,6 +39,7 @@ public class ExchangeRateService {
 
         String baseCurrencyCode = currencyPairCode.substring(0, ExchangeRateValidator.CURRENCY_CODE_LENGTH);
         String targetCurrencyCode = currencyPairCode.substring(ExchangeRateValidator.CURRENCY_CODE_LENGTH);
+
         ExchangeRate exchangeRate = exchangeRateDao.findByCurrencyPairCode(baseCurrencyCode, targetCurrencyCode);
         return ExchangeRateMapper.toDto(exchangeRate);
     }
