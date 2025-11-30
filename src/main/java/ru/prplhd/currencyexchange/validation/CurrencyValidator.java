@@ -13,7 +13,7 @@ public final class CurrencyValidator {
 
     public static void validateCurrencyCode(String code) {
         if (!code.matches(CURRENCY_CODE_REGEX)) {
-            throw new ValidationException("Invalid format. Currency code must consist of 3 English letters.");
+            throw new ValidationException("Invalid format. Currency code must consist of 3 uppercase English letters.");
         }
     }
 
