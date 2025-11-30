@@ -33,7 +33,7 @@ public class CurrenciesServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
             List<CurrencyDto> currencyDtos = currencyService.getAllCurrencies();
             JsonResponseWriter.write(currencyDtos, response, HttpServletResponse.SC_OK);
@@ -46,7 +46,7 @@ public class CurrenciesServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
             CreateCurrencyDto createCurrencyDto = createCurrencyDto(request);
             CurrencyDto currencyDto = currencyService.createCurrency(createCurrencyDto);

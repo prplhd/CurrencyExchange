@@ -31,19 +31,9 @@ public class ExchangeRateServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String path = request.getPathInfo();
-        if (path == null || path.equals("/")) {
-            JsonResponseWriter.write(
-                    new ErrorMessageDto("Invalid currency path. Please use /exchangeRates/{CODE}{CODE}"),
-                    response,
-                    HttpServletResponse.SC_BAD_REQUEST
-            );
-            return;
-        }
-        String currencyPairCode = extractCurrencyPairCode(request);
-
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
+            String currencyPairCode = extractCurrencyPairCode(request);
             ExchangeRateDto exchangeRateDto = exchangeRateService.getByCurrencyPairCode(currencyPairCode);
             JsonResponseWriter.write(
                     exchangeRateDto,
@@ -75,10 +65,10 @@ public class ExchangeRateServlet extends HttpServlet {
     }
 
     private String extractCurrencyPairCode(HttpServletRequest request) {
-        String path = request.getPathInfo();
-        if (path == null || path.equals("/")) {
-            throw new BadRequestException("Invalid currency path. Please use /exchangeRates/{CODE}{CODE}");
+        String pathInfo = request.getPathInfo();
+        if (pathInfo == null || pathInfo.equals("/")) {
+            throw new BadRequestException("Invalid currency path. Please use /exchangeRate/{CODE}{CODE}");
         }
-        return path.substring(1).trim().toUpperCase(Locale.ROOT);
+        return pathInfo.substring(1).trim().toUpperCase(Locale.ROOT);
     }
 }

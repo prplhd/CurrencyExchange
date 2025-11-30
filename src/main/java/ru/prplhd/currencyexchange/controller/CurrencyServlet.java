@@ -30,7 +30,7 @@ public class CurrencyServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String path = request.getPathInfo();
         if (path == null || path.equals("/")) {
             ErrorMessageDto errorMessageDto = new ErrorMessageDto("Invalid currency path. Please use /currency/{CODE}");
