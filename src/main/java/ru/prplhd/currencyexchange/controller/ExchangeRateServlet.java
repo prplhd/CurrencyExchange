@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import ru.prplhd.currencyexchange.dao.ExchangeRateDao;
 import ru.prplhd.currencyexchange.dto.ErrorMessageDto;
 import ru.prplhd.currencyexchange.dto.ExchangeRateDto;
+import ru.prplhd.currencyexchange.exception.BadRequestException;
 import ru.prplhd.currencyexchange.exception.DataAccessException;
 import ru.prplhd.currencyexchange.exception.ExchangeRateNotFoundException;
 import ru.prplhd.currencyexchange.exception.ValidationException;
@@ -34,13 +35,13 @@ public class ExchangeRateServlet extends HttpServlet {
         String path = request.getPathInfo();
         if (path == null || path.equals("/")) {
             JsonResponseWriter.write(
-                    new ErrorMessageDto("Invalid currency path. Please use /currency/{CODE}{CODE}"),
+                    new ErrorMessageDto("Invalid currency path. Please use /exchangeRates/{CODE}{CODE}"),
                     response,
                     HttpServletResponse.SC_BAD_REQUEST
             );
             return;
         }
-        String currencyPairCode = path.substring(1).trim().toUpperCase(Locale.ROOT);
+        String currencyPairCode = extractCurrencyPairCode(request);
 
         try {
             ExchangeRateDto exchangeRateDto = exchangeRateService.getByCurrencyPairCode(currencyPairCode);
@@ -50,7 +51,7 @@ public class ExchangeRateServlet extends HttpServlet {
                     HttpServletResponse.SC_OK
             );
 
-        } catch (ValidationException e) {
+        } catch (BadRequestException | ValidationException e) {
             JsonResponseWriter.write(
                     new ErrorMessageDto(e.getMessage()),
                     response,
@@ -71,5 +72,13 @@ public class ExchangeRateServlet extends HttpServlet {
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR
             );
         }
+    }
+
+    private String extractCurrencyPairCode(HttpServletRequest request) {
+        String path = request.getPathInfo();
+        if (path == null || path.equals("/")) {
+            throw new BadRequestException("Invalid currency path. Please use /exchangeRates/{CODE}{CODE}");
+        }
+        return path.substring(1).trim().toUpperCase(Locale.ROOT);
     }
 }
