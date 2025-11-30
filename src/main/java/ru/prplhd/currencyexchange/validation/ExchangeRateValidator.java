@@ -44,9 +44,13 @@ public final class ExchangeRateValidator {
             throw new ValidationException("Invalid currency pair. Base and target currency codes must be different.");
         }
 
-        BigDecimal rate;
+        validateRate(createExchangeRateDto.rate());
+    }
+
+    public static void validateRate(String rawRate) {
+        BigDecimal rate = null;
         try {
-            rate = new BigDecimal(createExchangeRateDto.rate());
+            rate = new BigDecimal(rawRate);
         } catch (NumberFormatException e) {
             throw new ValidationException("Invalid format. Rate must be a valid decimal number.");
         }

@@ -26,9 +26,7 @@ public final class CurrencyValidator {
         }
 
         String code = createCurrencyDto.code();
-        if (!code.matches(CURRENCY_CODE_REGEX)) {
-            throw new ValidationException("Invalid format. Currency code must consist of 3 uppercase English letters.");
-        }
+        validateCurrencyCode(code);
 
         String sign = createCurrencyDto.sign();
         if (sign != null && sign.length() > MAX_CURRENCY_SIGN_LENGTH) {

@@ -35,13 +35,22 @@ public class ExchangeRateService {
         return ExchangeRateMapper.toDto(exchangeRate);
     }
 
-    public ExchangeRateDto getByCurrencyPairCode(String currencyPairCode) {
+    public ExchangeRateDto getExchangeRate(String currencyPairCode) {
         CurrencyPair pair = ExchangeRateValidator.validateAndParseCurrencyPairCode(currencyPairCode);
 
         String baseCurrencyCode = pair.baseCurrencyCode();
         String targetCurrencyCode = pair.targetCurrencyCode();
 
         ExchangeRate exchangeRate = exchangeRateDao.findByCurrencyPairCode(baseCurrencyCode, targetCurrencyCode);
+        return ExchangeRateMapper.toDto(exchangeRate);
+    }
+
+    public ExchangeRateDto updateExchangeRate(String currencyPairCode, String rawRate) {
+        CurrencyPair pair = ExchangeRateValidator.validateAndParseCurrencyPairCode(currencyPairCode);
+        ExchangeRateValidator.validateRate(rawRate);
+        BigDecimal rate = new BigDecimal(rawRate);
+
+        ExchangeRate exchangeRate = exchangeRateDao.updateRateByCurrencyPair(pair, rate);
         return ExchangeRateMapper.toDto(exchangeRate);
     }
 }

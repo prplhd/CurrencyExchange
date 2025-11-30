@@ -29,7 +29,7 @@ public class CurrencyServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String code = extractCurrencyCode(request);
-        CurrencyDto currencyDto = currencyService.getCurrencyByCode(code);
+        CurrencyDto currencyDto = currencyService.getCurrency(code);
         JsonResponseWriter.write(
                 currencyDto,
                 response,

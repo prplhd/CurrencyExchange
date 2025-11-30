@@ -6,6 +6,7 @@ import ru.prplhd.currencyexchange.exception.DataAccessException;
 import ru.prplhd.currencyexchange.exception.ExchangeRateAlreadyExistsException;
 import ru.prplhd.currencyexchange.exception.ExchangeRateNotFoundException;
 import ru.prplhd.currencyexchange.model.Currency;
+import ru.prplhd.currencyexchange.model.CurrencyPair;
 import ru.prplhd.currencyexchange.model.ExchangeRate;
 
 import java.math.BigDecimal;
@@ -38,18 +39,25 @@ public class ExchangeRateDao {
             JOIN Currencies tc ON (er.targetCurrencyId = tc.id)
             """;
 
-    private static final String FIND_EXCHANGE_RATE_BY_CURRENCY_PAIR_CODE_SQL =
+    private static final String FIND_EXCHANGE_RATE_BY_CURRENCY_CODES_SQL =
             FIND_ALL_EXCHANGE_RATES_SQL + """
             WHERE bc.code = ?
-            AND tc.code = ?;
+            AND tc.code = ?
             """;
 
-    private static final String INSERT_EXCHANGE_RATE_BY_CURRENCY_PAIR_CODE_SQL = """
+    private static final String INSERT_EXCHANGE_RATE_BY_CURRENCY_CODES_SQL = """
             INSERT INTO ExchangeRates (BaseCurrencyId, TargetCurrencyId, Rate)
             SELECT bc.Id, tc.Id, ?
             FROM Currencies bc, Currencies tc
             WHERE bc.Code = ?
             AND tc.Code = ?
+            """;
+
+    private static final String UPDATE_RATE_BY_CURRENCY_CODES_SQL = """
+            UPDATE ExchangeRates
+            SET rate = ?
+            WHERE baseCurrencyId = (SELECT id FROM Currencies WHERE code = ?)
+            AND targetCurrencyId = (SELECT id FROM Currencies WHERE code = ?)
             """;
 
     public List<ExchangeRate> findAll() {
@@ -72,7 +80,7 @@ public class ExchangeRateDao {
 
     public ExchangeRate findByCurrencyPairCode(String baseCurrencyCode, String targetCurrencyCode) {
         try (Connection connection = ConnectionProvider.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(FIND_EXCHANGE_RATE_BY_CURRENCY_PAIR_CODE_SQL)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(FIND_EXCHANGE_RATE_BY_CURRENCY_CODES_SQL)) {
 
             preparedStatement.setString(1, baseCurrencyCode);
             preparedStatement.setString(2, targetCurrencyCode);
@@ -91,7 +99,7 @@ public class ExchangeRateDao {
 
     public ExchangeRate insert(String baseCurrencyCode, String targetCurrencyCode, BigDecimal rate) {
         try (Connection connection = ConnectionProvider.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_EXCHANGE_RATE_BY_CURRENCY_PAIR_CODE_SQL)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_EXCHANGE_RATE_BY_CURRENCY_CODES_SQL)) {
 
             preparedStatement.setBigDecimal(1, rate);
             preparedStatement.setString(2, baseCurrencyCode);
@@ -112,6 +120,27 @@ public class ExchangeRateDao {
         }
 
         return findByCurrencyPairCode(baseCurrencyCode, targetCurrencyCode);
+    }
+
+    public ExchangeRate updateRateByCurrencyPair(CurrencyPair pair, BigDecimal rate) {
+        try (Connection connection = ConnectionProvider.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_RATE_BY_CURRENCY_CODES_SQL)) {
+
+            preparedStatement.setBigDecimal(1, rate);
+            preparedStatement.setString(2, pair.baseCurrencyCode());
+            preparedStatement.setString(3, pair.targetCurrencyCode());
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new ExchangeRateNotFoundException("Exchange rate not found for currency pair '%s' / '%s'."
+                        .formatted(pair.baseCurrencyCode(), pair.targetCurrencyCode()));
+            }
+
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to update exchange rate into database", e);
+        }
+
+        return findByCurrencyPairCode(pair.baseCurrencyCode(), pair.targetCurrencyCode());
     }
 
     private ExchangeRate mapToExchangeRate(ResultSet resultSet) throws SQLException {
