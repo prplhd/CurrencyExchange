@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ExchangeRateDao {
     private static final String FIND_ALL_EXCHANGE_RATES_SQL = """
@@ -78,19 +79,17 @@ public class ExchangeRateDao {
         }
     }
 
-    public ExchangeRate findByCurrencyPairCode(String baseCurrencyCode, String targetCurrencyCode) {
+    public Optional<ExchangeRate> findByCurrencyPairCode(String baseCurrencyCode, String targetCurrencyCode) {
         try (Connection connection = ConnectionProvider.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_EXCHANGE_RATE_BY_CURRENCY_CODES_SQL)) {
 
             preparedStatement.setString(1, baseCurrencyCode);
             preparedStatement.setString(2, targetCurrencyCode);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return mapToExchangeRate(resultSet);
-                } else {
-                    throw new ExchangeRateNotFoundException("Exchange rate with codes '%s' and '%s' not found"
-                            .formatted(baseCurrencyCode, targetCurrencyCode));
+                if (!resultSet.next()) {
+                    return Optional.empty();
                 }
+                return Optional.of(mapToExchangeRate(resultSet));
             }
         } catch (SQLException e) {
             throw new DataAccessException("Failed to load exchange rate from database", e);
@@ -119,28 +118,34 @@ public class ExchangeRateDao {
             throw new DataAccessException("Failed to insert exchange rate into database", e);
         }
 
-        return findByCurrencyPairCode(baseCurrencyCode, targetCurrencyCode);
+        return findByCurrencyPairCodeOrThrow(baseCurrencyCode, targetCurrencyCode);
     }
 
-    public ExchangeRate updateRateByCurrencyPair(CurrencyPair pair, BigDecimal rate) {
+    public ExchangeRate updateRateByCurrencyPairCode(String baseCurrencyCode, String targetCurrencyCode, BigDecimal rate) {
         try (Connection connection = ConnectionProvider.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_RATE_BY_CURRENCY_CODES_SQL)) {
 
             preparedStatement.setBigDecimal(1, rate);
-            preparedStatement.setString(2, pair.baseCurrencyCode());
-            preparedStatement.setString(3, pair.targetCurrencyCode());
+            preparedStatement.setString(2, baseCurrencyCode);
+            preparedStatement.setString(3, targetCurrencyCode);
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected == 0) {
                 throw new ExchangeRateNotFoundException("Exchange rate not found for currency pair '%s' / '%s'."
-                        .formatted(pair.baseCurrencyCode(), pair.targetCurrencyCode()));
+                        .formatted(baseCurrencyCode, targetCurrencyCode));
             }
 
         } catch (SQLException e) {
             throw new DataAccessException("Failed to update exchange rate into database", e);
         }
 
-        return findByCurrencyPairCode(pair.baseCurrencyCode(), pair.targetCurrencyCode());
+        return findByCurrencyPairCodeOrThrow(baseCurrencyCode, targetCurrencyCode);
+    }
+
+    private ExchangeRate findByCurrencyPairCodeOrThrow(String baseCurrencyCode, String targetCurrencyCode) {
+        return findByCurrencyPairCode(baseCurrencyCode, targetCurrencyCode)
+                .orElseThrow(() -> new ExchangeRateNotFoundException("Exchange rate with codes '%s' and '%s' not found"
+                        .formatted(baseCurrencyCode, targetCurrencyCode)));
     }
 
     private ExchangeRate mapToExchangeRate(ResultSet resultSet) throws SQLException {

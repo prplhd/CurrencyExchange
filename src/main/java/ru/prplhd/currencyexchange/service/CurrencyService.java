@@ -3,6 +3,7 @@ package ru.prplhd.currencyexchange.service;
 import ru.prplhd.currencyexchange.dao.CurrencyDao;
 import ru.prplhd.currencyexchange.dto.CreateCurrencyDto;
 import ru.prplhd.currencyexchange.dto.CurrencyDto;
+import ru.prplhd.currencyexchange.exception.CurrencyNotFoundException;
 import ru.prplhd.currencyexchange.mapper.CurrencyMapper;
 import ru.prplhd.currencyexchange.model.Currency;
 import ru.prplhd.currencyexchange.validation.CurrencyValidator;
@@ -18,7 +19,9 @@ public class CurrencyService {
 
     public CurrencyDto getCurrency(String code) {
         CurrencyValidator.validateCurrencyCode(code);
-        Currency currency = currencyDao.findByCode(code);
+        Currency currency = currencyDao.findByCode(code)
+                .orElseThrow(() -> new CurrencyNotFoundException("Currency with code '%s' not found".formatted(code)));
+
         return CurrencyMapper.toDto(currency);
     }
 

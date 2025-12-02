@@ -3,6 +3,7 @@ package ru.prplhd.currencyexchange.service;
 import ru.prplhd.currencyexchange.dao.ExchangeRateDao;
 import ru.prplhd.currencyexchange.dto.CreateExchangeRateDto;
 import ru.prplhd.currencyexchange.dto.ExchangeRateDto;
+import ru.prplhd.currencyexchange.exception.ExchangeRateNotFoundException;
 import ru.prplhd.currencyexchange.mapper.ExchangeRateMapper;
 import ru.prplhd.currencyexchange.model.CurrencyPair;
 import ru.prplhd.currencyexchange.model.ExchangeRate;
@@ -41,16 +42,23 @@ public class ExchangeRateService {
         String baseCurrencyCode = pair.baseCurrencyCode();
         String targetCurrencyCode = pair.targetCurrencyCode();
 
-        ExchangeRate exchangeRate = exchangeRateDao.findByCurrencyPairCode(baseCurrencyCode, targetCurrencyCode);
+        ExchangeRate exchangeRate = exchangeRateDao.findByCurrencyPairCode(baseCurrencyCode, targetCurrencyCode)
+                .orElseThrow(() -> new ExchangeRateNotFoundException("Exchange rate with codes '%s' and '%s' not found"
+                        .formatted(baseCurrencyCode, targetCurrencyCode)));
+
         return ExchangeRateMapper.toDto(exchangeRate);
     }
 
     public ExchangeRateDto updateExchangeRate(String currencyPairCode, String rawRate) {
         CurrencyPair pair = ExchangeRateValidator.validateAndParseCurrencyPairCode(currencyPairCode);
+        String baseCurrencyCode = pair.baseCurrencyCode();
+        String targetCurrencyCode = pair.targetCurrencyCode();
+
         ExchangeRateValidator.validateRate(rawRate);
         BigDecimal rate = new BigDecimal(rawRate);
 
-        ExchangeRate exchangeRate = exchangeRateDao.updateRateByCurrencyPair(pair, rate);
+        ExchangeRate exchangeRate = exchangeRateDao.updateRateByCurrencyPairCode(baseCurrencyCode, targetCurrencyCode, rate);
+
         return ExchangeRateMapper.toDto(exchangeRate);
     }
 }

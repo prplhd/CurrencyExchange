@@ -2,7 +2,6 @@ package ru.prplhd.currencyexchange.dao;
 
 import ru.prplhd.currencyexchange.database.ConnectionProvider;
 import ru.prplhd.currencyexchange.exception.CurrencyAlreadyExistsException;
-import ru.prplhd.currencyexchange.exception.CurrencyNotFoundException;
 import ru.prplhd.currencyexchange.exception.DataAccessException;
 import ru.prplhd.currencyexchange.model.Currency;
 import java.sql.Connection;
@@ -12,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class CurrencyDao {
     private static final String FIND_ALL_CURRENCIES_SQL = """
@@ -45,17 +45,16 @@ public class CurrencyDao {
         }
     }
 
-    public Currency findByCode(String code) {
+    public Optional<Currency> findByCode(String code) {
         try (Connection connection = ConnectionProvider.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_CURRENCY_BY_CODE_SQL)) {
 
             preparedStatement.setString(1, code);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return mapToCurrency(resultSet);
-                } else {
-                    throw new CurrencyNotFoundException("Currency with code '%s' not found".formatted(code));
+                if (!resultSet.next()){
+                    return Optional.empty();
                 }
+                return Optional.of(mapToCurrency(resultSet));
             }
         } catch (SQLException e) {
             throw new DataAccessException("Failed to load currencies from database", e);
