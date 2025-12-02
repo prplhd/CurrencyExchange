@@ -29,7 +29,7 @@ public class ExchangeRateServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String currencyPairCode = extractCurrencyPairCode(request);
+        String currencyPairCode = createCurrencyPairCode(request);
         ExchangeRateDto exchangeRateDto = exchangeRateService.getExchangeRate(currencyPairCode);
         JsonResponseWriter.write(
                 exchangeRateDto,
@@ -40,7 +40,7 @@ public class ExchangeRateServlet extends HttpServlet {
 
     @Override
     protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String currencyPairCode = extractCurrencyPairCode(request);
+        String currencyPairCode = createCurrencyPairCode(request);
         String rate = extractRate(request);
         ExchangeRateDto exchangeRateDto = exchangeRateService.updateExchangeRate(currencyPairCode, rate);
         JsonResponseWriter.write(
@@ -50,7 +50,7 @@ public class ExchangeRateServlet extends HttpServlet {
         );
     }
 
-    private String extractCurrencyPairCode(HttpServletRequest request) {
+    private String createCurrencyPairCode(HttpServletRequest request) {
         String pathInfo = request.getPathInfo();
         if (pathInfo == null || pathInfo.equals("/")) {
             throw new BadRequestException("Invalid currency path. Please use /exchangeRate/{CODE}{CODE}");

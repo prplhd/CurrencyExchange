@@ -9,13 +9,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import ru.prplhd.currencyexchange.dao.CurrencyDao;
 import ru.prplhd.currencyexchange.dto.CreateCurrencyDto;
 import ru.prplhd.currencyexchange.dto.CurrencyDto;
-import ru.prplhd.currencyexchange.exception.BadRequestException;
 import ru.prplhd.currencyexchange.service.CurrencyService;
 import ru.prplhd.currencyexchange.util.JsonResponseWriter;
+import ru.prplhd.currencyexchange.util.RequestParamExtractor;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
 
 @WebServlet("/currencies")
 public class CurrenciesServlet extends HttpServlet {
@@ -50,25 +49,9 @@ public class CurrenciesServlet extends HttpServlet {
     }
 
     private CreateCurrencyDto createCurrencyDto(HttpServletRequest request) {
-        String name = request.getParameter("name");
-        if (name == null || name.isBlank()) {
-            throw new BadRequestException("Missing or empty required parameter 'name'");
-        }
-        name = name.trim();
-
-        String code = request.getParameter("code");
-        if (code == null || code.isBlank()) {
-            throw new BadRequestException("Missing or empty required parameter 'code'");
-        }
-        code = code.trim().toUpperCase(Locale.ROOT);
-
-        String sign = request.getParameter("sign");
-        if (sign != null) {
-            sign = sign.trim();
-            if (sign.isBlank()) {
-                sign = null;
-            }
-        }
+        String name = RequestParamExtractor.requiredParam(request, "name");
+        String code = RequestParamExtractor.requiredUppercaseParam(request, "code");
+        String sign = RequestParamExtractor.optionalParam(request, "sign");
 
         return new CreateCurrencyDto(name, code, sign);
     }

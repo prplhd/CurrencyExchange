@@ -9,13 +9,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import ru.prplhd.currencyexchange.dao.ExchangeRateDao;
 import ru.prplhd.currencyexchange.dto.CreateExchangeRateDto;
 import ru.prplhd.currencyexchange.dto.ExchangeRateDto;
-import ru.prplhd.currencyexchange.exception.BadRequestException;
 import ru.prplhd.currencyexchange.service.ExchangeRateService;
 import ru.prplhd.currencyexchange.util.JsonResponseWriter;
+import ru.prplhd.currencyexchange.util.RequestParamExtractor;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
 
 @WebServlet("/exchangeRates")
 public class ExchangeRatesServlet extends HttpServlet {
@@ -49,23 +48,9 @@ public class ExchangeRatesServlet extends HttpServlet {
     }
 
     private CreateExchangeRateDto createExchangeRateDto(HttpServletRequest request) {
-        String baseCurrencyCode = request.getParameter("baseCurrencyCode");
-        if (baseCurrencyCode == null || baseCurrencyCode.isBlank()) {
-            throw new BadRequestException("Missing or empty required parameter 'baseCurrencyCode'");
-        }
-        baseCurrencyCode = baseCurrencyCode.trim().toUpperCase(Locale.ROOT);
-
-        String targetCurrencyCode = request.getParameter("targetCurrencyCode");
-        if (targetCurrencyCode == null || targetCurrencyCode.isBlank()) {
-            throw new BadRequestException("Missing or empty required parameter 'targetCurrencyCode'");
-        }
-        targetCurrencyCode = targetCurrencyCode.trim().toUpperCase(Locale.ROOT);
-
-        String rate = request.getParameter("rate");
-        if (rate == null || rate.isBlank()) {
-            throw new BadRequestException("Missing or empty required parameter 'rate'");
-        }
-        rate = rate.trim();
+        String baseCurrencyCode = RequestParamExtractor.requiredUppercaseParam(request, "baseCurrencyCode");
+        String targetCurrencyCode = RequestParamExtractor.requiredUppercaseParam(request, "targetCurrencyCode");
+        String rate = RequestParamExtractor.requiredParam(request, "rate");
 
         return new CreateExchangeRateDto(baseCurrencyCode, targetCurrencyCode, rate);
     }
