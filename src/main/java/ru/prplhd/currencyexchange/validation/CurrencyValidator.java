@@ -4,7 +4,8 @@ import ru.prplhd.currencyexchange.dto.CreateCurrencyDto;
 import ru.prplhd.currencyexchange.exception.ValidationException;
 
 public final class CurrencyValidator {
-    private static final String CURRENCY_CODE_REGEX = "[A-Z]{3}";
+    private static final String CURRENCY_CODE_REGEX = "^[A-Z]{3}$";
+    private static final String CURRENCY_NAME_REGEX = "^[A-Za-z ]+$";
 
     private static final int MIN_CURRENCY_NAME_LENGTH = 3;
     private static final int MAX_CURRENCY_NAME_LENGTH = 50;
@@ -25,8 +26,13 @@ public final class CurrencyValidator {
                     .formatted(MIN_CURRENCY_NAME_LENGTH, MAX_CURRENCY_NAME_LENGTH));
         }
 
+        if (!name.matches(CURRENCY_NAME_REGEX)) {
+            throw new ValidationException("Invalid format. Currency name must consist of English letters.");
+        }
+
         String code = createCurrencyDto.code();
         validateCurrencyCode(code);
+
 
         String sign = createCurrencyDto.sign();
         if (sign != null && sign.length() > MAX_CURRENCY_SIGN_LENGTH) {
