@@ -14,12 +14,14 @@ import ru.prplhd.currencyexchange.exception.DataAccessException;
 import ru.prplhd.currencyexchange.exception.ExchangeRateAlreadyExistsException;
 import ru.prplhd.currencyexchange.exception.ExchangeRateNotFoundException;
 import ru.prplhd.currencyexchange.exception.ValidationException;
-import ru.prplhd.currencyexchange.util.JsonResponseWriter;
+import ru.prplhd.currencyexchange.webutil.JsonResponseWriter;
+import ru.prplhd.currencyexchange.webutil.ResponseWriter;
 
 import java.io.IOException;
 
 @WebFilter("/*")
 public class ExceptionHandlingFilter extends HttpFilter {
+    private final ResponseWriter responseWriter =  new JsonResponseWriter();
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException {
@@ -29,21 +31,21 @@ public class ExceptionHandlingFilter extends HttpFilter {
             chain.doFilter(req, res);
 
         } catch (BadRequestException | ValidationException e) {
-            JsonResponseWriter.write(
+            responseWriter.write(
                     new ErrorMessageDto(e.getMessage()),
                     response,
                     HttpServletResponse.SC_BAD_REQUEST
             );
 
         } catch (CurrencyNotFoundException | ExchangeRateNotFoundException e) {
-            JsonResponseWriter.write(new ErrorMessageDto(
+            responseWriter.write(new ErrorMessageDto(
                             e.getMessage()),
                     response,
                     HttpServletResponse.SC_NOT_FOUND
             );
 
         } catch (CurrencyAlreadyExistsException | ExchangeRateAlreadyExistsException e) {
-            JsonResponseWriter.write(
+            responseWriter.write(
                     new ErrorMessageDto(e.getMessage()),
                     response,
                     HttpServletResponse.SC_CONFLICT
@@ -51,7 +53,7 @@ public class ExceptionHandlingFilter extends HttpFilter {
 
         } catch (DataAccessException e) {
             e.printStackTrace();
-            JsonResponseWriter.write(
+            responseWriter.write(
                     new ErrorMessageDto("Failed to process request. Please try again later."),
                     response,
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR
@@ -59,7 +61,7 @@ public class ExceptionHandlingFilter extends HttpFilter {
 
         } catch (Exception e) {
             e.printStackTrace();
-            JsonResponseWriter.write(
+            responseWriter.write(
                     new ErrorMessageDto("Unexpected server error. Please try again later."),
                     response,
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR

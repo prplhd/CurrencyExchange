@@ -10,13 +10,15 @@ import ru.prplhd.currencyexchange.dao.CurrencyDao;
 import ru.prplhd.currencyexchange.dto.CurrencyDto;
 import ru.prplhd.currencyexchange.exception.BadRequestException;
 import ru.prplhd.currencyexchange.service.CurrencyService;
-import ru.prplhd.currencyexchange.util.JsonResponseWriter;
+import ru.prplhd.currencyexchange.webutil.JsonResponseWriter;
+import ru.prplhd.currencyexchange.webutil.ResponseWriter;
 
 import java.io.IOException;
 import java.util.Locale;
 
 @WebServlet("/currency/*")
 public class CurrencyServlet extends HttpServlet {
+    private final ResponseWriter responseWriter =  new JsonResponseWriter();
     private CurrencyService currencyService;
 
     @Override
@@ -30,7 +32,7 @@ public class CurrencyServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String code = extractCurrencyCode(request);
         CurrencyDto currencyDto = currencyService.getCurrency(code);
-        JsonResponseWriter.write(
+        responseWriter.write(
                 currencyDto,
                 response,
                 HttpServletResponse.SC_OK

@@ -10,14 +10,16 @@ import ru.prplhd.currencyexchange.dao.CurrencyDao;
 import ru.prplhd.currencyexchange.dto.CreateCurrencyDto;
 import ru.prplhd.currencyexchange.dto.CurrencyDto;
 import ru.prplhd.currencyexchange.service.CurrencyService;
-import ru.prplhd.currencyexchange.util.JsonResponseWriter;
-import ru.prplhd.currencyexchange.util.RequestParamExtractor;
+import ru.prplhd.currencyexchange.webutil.JsonResponseWriter;
+import ru.prplhd.currencyexchange.webutil.RequestParamExtractor;
+import ru.prplhd.currencyexchange.webutil.ResponseWriter;
 
 import java.io.IOException;
 import java.util.List;
 
 @WebServlet("/currencies")
 public class CurrenciesServlet extends HttpServlet {
+    private final ResponseWriter responseWriter =  new JsonResponseWriter();
     private CurrencyService currencyService;
 
     @Override
@@ -30,7 +32,7 @@ public class CurrenciesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         List<CurrencyDto> currencyDtos = currencyService.getAllCurrencies();
-        JsonResponseWriter.write(
+        responseWriter.write(
                 currencyDtos,
                 response,
                 HttpServletResponse.SC_OK
@@ -41,7 +43,7 @@ public class CurrenciesServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         CreateCurrencyDto createCurrencyDto = createCurrencyDto(request);
         CurrencyDto currencyDto = currencyService.createCurrency(createCurrencyDto);
-        JsonResponseWriter.write(
+        responseWriter.write(
                 currencyDto,
                 response,
                 HttpServletResponse.SC_CREATED

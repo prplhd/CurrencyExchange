@@ -10,13 +10,16 @@ import ru.prplhd.currencyexchange.dao.ExchangeRateDao;
 import ru.prplhd.currencyexchange.dto.ExchangeDto;
 import ru.prplhd.currencyexchange.dto.ExchangeRequestDto;
 import ru.prplhd.currencyexchange.service.ExchangeService;
-import ru.prplhd.currencyexchange.util.JsonResponseWriter;
-import ru.prplhd.currencyexchange.util.RequestParamExtractor;
+import ru.prplhd.currencyexchange.webutil.JsonResponseWriter;
+import ru.prplhd.currencyexchange.webutil.RequestParamExtractor;
+import ru.prplhd.currencyexchange.webutil.ResponseWriter;
 
 import java.io.IOException;
 
 @WebServlet("/exchange")
 public class ExchangeServlet extends HttpServlet {
+    private final ResponseWriter responseWriter =  new JsonResponseWriter();
+
     private ExchangeService exchangeService;
 
     @Override
@@ -30,7 +33,7 @@ public class ExchangeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         ExchangeRequestDto exchangeRequestDto = createExchangeRequestDto(request);
         ExchangeDto exchangeDto = exchangeService.getExchange(exchangeRequestDto);
-        JsonResponseWriter.write(
+        responseWriter.write(
                 exchangeDto,
                 response,
                 HttpServletResponse.SC_OK

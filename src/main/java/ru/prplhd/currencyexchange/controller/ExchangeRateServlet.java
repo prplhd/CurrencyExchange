@@ -10,7 +10,8 @@ import ru.prplhd.currencyexchange.dao.ExchangeRateDao;
 import ru.prplhd.currencyexchange.dto.ExchangeRateDto;
 import ru.prplhd.currencyexchange.exception.BadRequestException;
 import ru.prplhd.currencyexchange.service.ExchangeRateService;
-import ru.prplhd.currencyexchange.util.JsonResponseWriter;
+import ru.prplhd.currencyexchange.webutil.JsonResponseWriter;
+import ru.prplhd.currencyexchange.webutil.ResponseWriter;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 
 @WebServlet("/exchangeRate/*")
 public class ExchangeRateServlet extends HttpServlet {
+    private final ResponseWriter responseWriter =  new JsonResponseWriter();
     private ExchangeRateService exchangeRateService;
 
     @Override
@@ -31,7 +33,7 @@ public class ExchangeRateServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String currencyPairCode = createCurrencyPairCode(request);
         ExchangeRateDto exchangeRateDto = exchangeRateService.getExchangeRate(currencyPairCode);
-        JsonResponseWriter.write(
+        responseWriter.write(
                 exchangeRateDto,
                 response,
                 HttpServletResponse.SC_OK
@@ -43,7 +45,7 @@ public class ExchangeRateServlet extends HttpServlet {
         String currencyPairCode = createCurrencyPairCode(request);
         String rate = extractRate(request);
         ExchangeRateDto exchangeRateDto = exchangeRateService.updateExchangeRate(currencyPairCode, rate);
-        JsonResponseWriter.write(
+        responseWriter.write(
                 exchangeRateDto,
                 response,
                 HttpServletResponse.SC_OK
