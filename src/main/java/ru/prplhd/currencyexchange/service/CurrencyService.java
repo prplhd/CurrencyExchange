@@ -33,7 +33,7 @@ public class CurrencyService {
     public CurrencyDto createCurrency(CreateCurrencyDto createCurrencyDto) {
         CurrencyValidator.validateCreateCurrencyDto(createCurrencyDto);
         Currency currencyToSave = CurrencyMapper.fromCreateDto(createCurrencyDto);
-        Currency savedCurrency = currencyDao.insert(currencyToSave);
+        Currency savedCurrency = currencyDao.save(currencyToSave);
         return CurrencyMapper.toDto(savedCurrency);
     }
 }

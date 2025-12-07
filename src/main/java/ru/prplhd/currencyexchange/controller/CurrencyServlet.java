@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ru.prplhd.currencyexchange.dao.CurrencyDao;
+import ru.prplhd.currencyexchange.dao.JdbcCurrencyDao;
 import ru.prplhd.currencyexchange.dto.CurrencyDto;
 import ru.prplhd.currencyexchange.exception.BadRequestException;
 import ru.prplhd.currencyexchange.service.CurrencyService;
@@ -24,8 +25,8 @@ public class CurrencyServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        CurrencyDao dao = new CurrencyDao();
-        currencyService = new CurrencyService(dao);
+        CurrencyDao currencyDao = new JdbcCurrencyDao();
+        currencyService = new CurrencyService(currencyDao);
     }
 
     @Override

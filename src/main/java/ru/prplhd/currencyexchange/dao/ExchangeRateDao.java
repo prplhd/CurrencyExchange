@@ -2,11 +2,10 @@ package ru.prplhd.currencyexchange.dao;
 
 import ru.prplhd.currencyexchange.database.ConnectionProvider;
 import ru.prplhd.currencyexchange.exception.CurrencyNotFoundException;
-import ru.prplhd.currencyexchange.exception.DataAccessException;
+import ru.prplhd.currencyexchange.exception.DatabaseException;
 import ru.prplhd.currencyexchange.exception.ExchangeRateAlreadyExistsException;
 import ru.prplhd.currencyexchange.exception.ExchangeRateNotFoundException;
 import ru.prplhd.currencyexchange.model.Currency;
-import ru.prplhd.currencyexchange.model.CurrencyPair;
 import ru.prplhd.currencyexchange.model.ExchangeRate;
 
 import java.math.BigDecimal;
@@ -75,7 +74,7 @@ public class ExchangeRateDao {
                 return exchangeRates;
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Failed to load exchange rates from database", e);
+            throw new DatabaseException("Failed to load exchange rates from database", e);
         }
     }
 
@@ -92,7 +91,7 @@ public class ExchangeRateDao {
                 return Optional.of(mapToExchangeRate(resultSet));
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Failed to load exchange rate from database", e);
+            throw new DatabaseException("Failed to load exchange rate from database", e);
         }
     }
 
@@ -115,7 +114,7 @@ public class ExchangeRateDao {
                 throw new ExchangeRateAlreadyExistsException("Exchange rate for currency pair '%s' / '%s' already exists."
                         .formatted(baseCurrencyCode, targetCurrencyCode));
             }
-            throw new DataAccessException("Failed to insert exchange rate into database", e);
+            throw new DatabaseException("Failed to insert exchange rate into database", e);
         }
 
         return findByCurrencyPairCodeOrThrow(baseCurrencyCode, targetCurrencyCode);
@@ -136,7 +135,7 @@ public class ExchangeRateDao {
             }
 
         } catch (SQLException e) {
-            throw new DataAccessException("Failed to update exchange rate into database", e);
+            throw new DatabaseException("Failed to update exchange rate into database", e);
         }
 
         return findByCurrencyPairCodeOrThrow(baseCurrencyCode, targetCurrencyCode);

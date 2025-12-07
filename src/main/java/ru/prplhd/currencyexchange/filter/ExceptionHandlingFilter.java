@@ -10,7 +10,7 @@ import ru.prplhd.currencyexchange.dto.ErrorMessageDto;
 import ru.prplhd.currencyexchange.exception.BadRequestException;
 import ru.prplhd.currencyexchange.exception.CurrencyAlreadyExistsException;
 import ru.prplhd.currencyexchange.exception.CurrencyNotFoundException;
-import ru.prplhd.currencyexchange.exception.DataAccessException;
+import ru.prplhd.currencyexchange.exception.DatabaseException;
 import ru.prplhd.currencyexchange.exception.ExchangeRateAlreadyExistsException;
 import ru.prplhd.currencyexchange.exception.ExchangeRateNotFoundException;
 import ru.prplhd.currencyexchange.exception.ValidationException;
@@ -51,7 +51,7 @@ public class ExceptionHandlingFilter extends HttpFilter {
                     HttpServletResponse.SC_CONFLICT
             );
 
-        } catch (DataAccessException e) {
+        } catch (DatabaseException e) {
             e.printStackTrace();
             responseWriter.write(
                     new ErrorMessageDto("Failed to process request. Please try again later."),
