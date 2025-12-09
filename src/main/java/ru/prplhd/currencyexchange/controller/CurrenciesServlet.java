@@ -8,8 +8,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ru.prplhd.currencyexchange.dao.CurrencyDao;
 import ru.prplhd.currencyexchange.dao.JdbcCurrencyDao;
-import ru.prplhd.currencyexchange.dto.CreateCurrencyDto;
-import ru.prplhd.currencyexchange.dto.CurrencyDto;
+import ru.prplhd.currencyexchange.dto.CurrencyRequestDto;
+import ru.prplhd.currencyexchange.dto.CurrencyResponseDto;
 import ru.prplhd.currencyexchange.service.CurrencyService;
 import ru.prplhd.currencyexchange.webutil.JsonResponseWriter;
 import ru.prplhd.currencyexchange.webutil.RequestParamExtractor;
@@ -32,7 +32,7 @@ public class CurrenciesServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        List<CurrencyDto> currencyDtos = currencyService.getAllCurrencies();
+        List<CurrencyResponseDto> currencyDtos = currencyService.getAllCurrencies();
         responseWriter.write(
                 currencyDtos,
                 response,
@@ -42,8 +42,8 @@ public class CurrenciesServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        CreateCurrencyDto createCurrencyDto = createCurrencyDto(request);
-        CurrencyDto currencyDto = currencyService.createCurrency(createCurrencyDto);
+        CurrencyRequestDto currencyRequestDto = createCurrencyDto(request);
+        CurrencyResponseDto currencyDto = currencyService.createCurrency(currencyRequestDto);
         responseWriter.write(
                 currencyDto,
                 response,
@@ -51,11 +51,11 @@ public class CurrenciesServlet extends HttpServlet {
         );
     }
 
-    private CreateCurrencyDto createCurrencyDto(HttpServletRequest request) {
+    private CurrencyRequestDto createCurrencyDto(HttpServletRequest request) {
         String name = RequestParamExtractor.requiredParam(request, "name");
         String code = RequestParamExtractor.requiredUppercaseParam(request, "code");
         String sign = RequestParamExtractor.optionalParam(request, "sign");
 
-        return new CreateCurrencyDto(name, code, sign);
+        return new CurrencyRequestDto(name, code, sign);
     }
 }

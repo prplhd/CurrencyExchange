@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ru.prplhd.currencyexchange.dao.CurrencyDao;
 import ru.prplhd.currencyexchange.dao.JdbcCurrencyDao;
-import ru.prplhd.currencyexchange.dto.CurrencyDto;
+import ru.prplhd.currencyexchange.dto.CurrencyResponseDto;
 import ru.prplhd.currencyexchange.exception.BadRequestException;
 import ru.prplhd.currencyexchange.service.CurrencyService;
 import ru.prplhd.currencyexchange.webutil.JsonResponseWriter;
@@ -32,7 +32,7 @@ public class CurrencyServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String code = extractCurrencyCode(request);
-        CurrencyDto currencyDto = currencyService.getCurrency(code);
+        CurrencyResponseDto currencyDto = currencyService.getCurrency(code);
         responseWriter.write(
                 currencyDto,
                 response,

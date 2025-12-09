@@ -1,8 +1,8 @@
 package ru.prplhd.currencyexchange.service;
 
 import ru.prplhd.currencyexchange.dao.CurrencyDao;
-import ru.prplhd.currencyexchange.dto.CreateCurrencyDto;
-import ru.prplhd.currencyexchange.dto.CurrencyDto;
+import ru.prplhd.currencyexchange.dto.CurrencyRequestDto;
+import ru.prplhd.currencyexchange.dto.CurrencyResponseDto;
 import ru.prplhd.currencyexchange.exception.CurrencyNotFoundException;
 import ru.prplhd.currencyexchange.mapper.CurrencyMapper;
 import ru.prplhd.currencyexchange.model.Currency;
@@ -17,7 +17,7 @@ public class CurrencyService {
         this.currencyDao = dao;
     }
 
-    public CurrencyDto getCurrency(String code) {
+    public CurrencyResponseDto getCurrency(String code) {
         CurrencyValidator.validateCurrencyCode(code);
         Currency currency = currencyDao.findByCode(code)
                 .orElseThrow(() -> new CurrencyNotFoundException("Currency with code '%s' not found".formatted(code)));
@@ -25,14 +25,14 @@ public class CurrencyService {
         return CurrencyMapper.toDto(currency);
     }
 
-    public List<CurrencyDto> getAllCurrencies() {
+    public List<CurrencyResponseDto> getAllCurrencies() {
         List<Currency> currencies = currencyDao.findAll();
         return CurrencyMapper.toDtos(currencies);
     }
 
-    public CurrencyDto createCurrency(CreateCurrencyDto createCurrencyDto) {
-        CurrencyValidator.validateCreateCurrencyDto(createCurrencyDto);
-        Currency currencyToSave = CurrencyMapper.fromCreateDto(createCurrencyDto);
+    public CurrencyResponseDto createCurrency(CurrencyRequestDto currencyRequestDto) {
+        CurrencyValidator.validateCreateCurrencyDto(currencyRequestDto);
+        Currency currencyToSave = CurrencyMapper.fromCreateDto(currencyRequestDto);
         Currency savedCurrency = currencyDao.save(currencyToSave);
         return CurrencyMapper.toDto(savedCurrency);
     }

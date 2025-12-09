@@ -1,50 +1,41 @@
 package ru.prplhd.currencyexchange.validation;
 
-import ru.prplhd.currencyexchange.dto.CreateExchangeRateDto;
+import ru.prplhd.currencyexchange.dto.ExchangeRateRequestDto;
 import ru.prplhd.currencyexchange.exception.ValidationException;
 import ru.prplhd.currencyexchange.model.CurrencyPair;
 
 import java.math.BigDecimal;
 
 public final class ExchangeRateValidator {
-    private static final int CURRENCY_CODE_LENGTH = 3;
-    private static final int CURRENCY_PAIR_CODE_LENGTH = CURRENCY_CODE_LENGTH * 2;
-
     private static final int MAX_RATE_FRACTIONAL_PART_DIGITS = 6;
     private static final int MAX_RATE_INTEGER_PART_DIGITS = 6;
 
     private ExchangeRateValidator() {}
 
-    public static CurrencyPair validateAndParseCurrencyPairCode(String currencyPairCode) {
-        if (currencyPairCode.length() != CURRENCY_PAIR_CODE_LENGTH) {
-            throw new ValidationException("Invalid format. Currency pair code must consist of exactly 6 uppercase English letters.");
-        }
-
-        String baseCurrencyCode = currencyPairCode.substring(0, CURRENCY_CODE_LENGTH);
+    public static void validateCurrencyPair(CurrencyPair currencyPair) {
+        String baseCurrencyCode = currencyPair.baseCurrencyCode();
         CurrencyValidator.validateCurrencyCode(baseCurrencyCode);
 
-        String targetCurrencyCode = currencyPairCode.substring(CURRENCY_CODE_LENGTH);
+        String targetCurrencyCode = currencyPair.targetCurrencyCode();
         CurrencyValidator.validateCurrencyCode(targetCurrencyCode);
 
         if (baseCurrencyCode.equals(targetCurrencyCode)) {
             throw new ValidationException("Invalid currency pair. Base and target currency codes must be different.");
         }
-
-        return new CurrencyPair(baseCurrencyCode, targetCurrencyCode);
     }
 
-    public static void validateCreateExchangeRateDto(CreateExchangeRateDto createExchangeRateDto) {
-        String baseCurrencyCode = createExchangeRateDto.baseCurrencyCode();
+    public static void validateExchangeRateRequestDto(ExchangeRateRequestDto exchangeRateRequestDto) {
+        String baseCurrencyCode = exchangeRateRequestDto.baseCurrencyCode();
         CurrencyValidator.validateCurrencyCode(baseCurrencyCode);
 
-        String targetCurrencyCode = createExchangeRateDto.targetCurrencyCode();
+        String targetCurrencyCode = exchangeRateRequestDto.targetCurrencyCode();
         CurrencyValidator.validateCurrencyCode(targetCurrencyCode);
 
         if (baseCurrencyCode.equals(targetCurrencyCode)) {
             throw new ValidationException("Invalid currency pair. Base and target currency codes must be different.");
         }
 
-        validateRate(createExchangeRateDto.rate());
+        validateRate(exchangeRateRequestDto.rate());
     }
 
     public static void validateRate(String rawRate) {

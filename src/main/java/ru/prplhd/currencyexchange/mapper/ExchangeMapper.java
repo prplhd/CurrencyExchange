@@ -1,16 +1,16 @@
 package ru.prplhd.currencyexchange.mapper;
 
-import ru.prplhd.currencyexchange.dto.CurrencyDto;
-import ru.prplhd.currencyexchange.dto.ExchangeDto;
+import ru.prplhd.currencyexchange.dto.CurrencyResponseDto;
+import ru.prplhd.currencyexchange.dto.ExchangeResponseDto;
 import ru.prplhd.currencyexchange.model.Exchange;
 
 public final class ExchangeMapper {
     private ExchangeMapper() {}
 
-    public static ExchangeDto toDto(Exchange exchange) {
-        CurrencyDto baseCurrencyDto = CurrencyMapper.toDto(exchange.baseCurrency());
-        CurrencyDto targetCurrencyDto = CurrencyMapper.toDto(exchange.targetCurrency());
-        return new ExchangeDto(
+    public static ExchangeResponseDto toDto(Exchange exchange) {
+        CurrencyResponseDto baseCurrencyDto = CurrencyMapper.toDto(exchange.baseCurrency());
+        CurrencyResponseDto targetCurrencyDto = CurrencyMapper.toDto(exchange.targetCurrency());
+        return new ExchangeResponseDto(
                 baseCurrencyDto,
                 targetCurrencyDto,
                 exchange.rate(),

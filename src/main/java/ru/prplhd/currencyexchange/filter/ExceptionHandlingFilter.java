@@ -6,7 +6,7 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpFilter;
 import jakarta.servlet.http.HttpServletResponse;
-import ru.prplhd.currencyexchange.dto.ErrorMessageDto;
+import ru.prplhd.currencyexchange.dto.ErrorResponseDto;
 import ru.prplhd.currencyexchange.exception.BadRequestException;
 import ru.prplhd.currencyexchange.exception.CurrencyAlreadyExistsException;
 import ru.prplhd.currencyexchange.exception.CurrencyNotFoundException;
@@ -32,13 +32,13 @@ public class ExceptionHandlingFilter extends HttpFilter {
 
         } catch (BadRequestException | ValidationException e) {
             responseWriter.write(
-                    new ErrorMessageDto(e.getMessage()),
+                    new ErrorResponseDto(e.getMessage()),
                     response,
                     HttpServletResponse.SC_BAD_REQUEST
             );
 
         } catch (CurrencyNotFoundException | ExchangeRateNotFoundException e) {
-            responseWriter.write(new ErrorMessageDto(
+            responseWriter.write(new ErrorResponseDto(
                             e.getMessage()),
                     response,
                     HttpServletResponse.SC_NOT_FOUND
@@ -46,7 +46,7 @@ public class ExceptionHandlingFilter extends HttpFilter {
 
         } catch (CurrencyAlreadyExistsException | ExchangeRateAlreadyExistsException e) {
             responseWriter.write(
-                    new ErrorMessageDto(e.getMessage()),
+                    new ErrorResponseDto(e.getMessage()),
                     response,
                     HttpServletResponse.SC_CONFLICT
             );
@@ -54,7 +54,7 @@ public class ExceptionHandlingFilter extends HttpFilter {
         } catch (DatabaseException e) {
             e.printStackTrace();
             responseWriter.write(
-                    new ErrorMessageDto("Failed to process request. Please try again later."),
+                    new ErrorResponseDto("Failed to process request. Please try again later."),
                     response,
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR
             );
@@ -62,7 +62,7 @@ public class ExceptionHandlingFilter extends HttpFilter {
         } catch (Exception e) {
             e.printStackTrace();
             responseWriter.write(
-                    new ErrorMessageDto("Unexpected server error. Please try again later."),
+                    new ErrorResponseDto("Unexpected server error. Please try again later."),
                     response,
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR
             );

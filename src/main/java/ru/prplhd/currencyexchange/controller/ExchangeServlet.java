@@ -6,8 +6,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ru.prplhd.currencyexchange.dao.ExchangeRateDao;
-import ru.prplhd.currencyexchange.dto.ExchangeDto;
+import ru.prplhd.currencyexchange.dao.JdbcExchangeRateDao;
+import ru.prplhd.currencyexchange.dto.ExchangeResponseDto;
 import ru.prplhd.currencyexchange.dto.ExchangeRequestDto;
 import ru.prplhd.currencyexchange.service.ExchangeService;
 import ru.prplhd.currencyexchange.webutil.JsonResponseWriter;
@@ -25,16 +25,16 @@ public class ExchangeServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        ExchangeRateDao exchangeRateDao = new ExchangeRateDao();
-        exchangeService = new ExchangeService(exchangeRateDao);
+        JdbcExchangeRateDao jdbcExchangeRateDao = new JdbcExchangeRateDao();
+        exchangeService = new ExchangeService(jdbcExchangeRateDao);
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         ExchangeRequestDto exchangeRequestDto = createExchangeRequestDto(request);
-        ExchangeDto exchangeDto = exchangeService.getExchange(exchangeRequestDto);
+        ExchangeResponseDto exchangeResponseDto = exchangeService.getExchange(exchangeRequestDto);
         responseWriter.write(
-                exchangeDto,
+                exchangeResponseDto,
                 response,
                 HttpServletResponse.SC_OK
         );

@@ -1,6 +1,6 @@
 package ru.prplhd.currencyexchange.validation;
 
-import ru.prplhd.currencyexchange.dto.CreateCurrencyDto;
+import ru.prplhd.currencyexchange.dto.CurrencyRequestDto;
 import ru.prplhd.currencyexchange.exception.ValidationException;
 
 public final class CurrencyValidator {
@@ -19,8 +19,8 @@ public final class CurrencyValidator {
         }
     }
 
-    public static void validateCreateCurrencyDto(CreateCurrencyDto createCurrencyDto) {
-        String name = createCurrencyDto.name();
+    public static void validateCreateCurrencyDto(CurrencyRequestDto currencyRequestDto) {
+        String name = currencyRequestDto.name();
         if (name.length() < MIN_CURRENCY_NAME_LENGTH || name.length() > MAX_CURRENCY_NAME_LENGTH) {
             throw new ValidationException("Invalid name length. Currency name must be between %d and %d characters."
                     .formatted(MIN_CURRENCY_NAME_LENGTH, MAX_CURRENCY_NAME_LENGTH));
@@ -30,11 +30,11 @@ public final class CurrencyValidator {
             throw new ValidationException("Invalid format. Currency name must consist of English letters.");
         }
 
-        String code = createCurrencyDto.code();
+        String code = currencyRequestDto.code();
         validateCurrencyCode(code);
 
 
-        String sign = createCurrencyDto.sign();
+        String sign = currencyRequestDto.sign();
         if (sign != null && sign.length() > MAX_CURRENCY_SIGN_LENGTH) {
             throw new ValidationException("Invalid sign length. When provided, currency sign must not be longer than %d characters."
                     .formatted(MAX_CURRENCY_SIGN_LENGTH));

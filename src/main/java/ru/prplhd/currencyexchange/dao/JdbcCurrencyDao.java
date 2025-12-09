@@ -19,11 +19,6 @@ public class JdbcCurrencyDao implements CurrencyDao {
             FROM currencies
             """;
 
-    private static final String FIND_BY_ID_QUERY =
-            FIND_ALL_QUERY + """
-            WHERE id = ?
-            """;
-
     private static final String FIND_BY_CODE_QUERY =
             FIND_ALL_QUERY + """
             WHERE code = ?
@@ -54,24 +49,6 @@ public class JdbcCurrencyDao implements CurrencyDao {
     }
 
     @Override
-    public Optional<Currency> findById(Long id) {
-        try (Connection connection = ConnectionProvider.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_ID_QUERY)) {
-
-            preparedStatement.setLong(1, id);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()){
-                return Optional.of(getCurrency(resultSet));
-            }
-            return Optional.empty();
-
-        } catch (SQLException e) {
-            throw new DatabaseException("Failed to read currencies from database", e);
-        }
-    }
-
-    @Override
     public Optional<Currency> findByCode(String code) {
         try (Connection connection = ConnectionProvider.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_CODE_QUERY)) {
@@ -94,9 +71,9 @@ public class JdbcCurrencyDao implements CurrencyDao {
         try (Connection connection = ConnectionProvider.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SAVE_QUERY)) {
 
-            preparedStatement.setString(1, currency.code());
-            preparedStatement.setString(2, currency.name());
-            preparedStatement.setString(3, currency.sign());
+            preparedStatement.setString(1, currency.getCode());
+            preparedStatement.setString(2, currency.getName());
+            preparedStatement.setString(3, currency.getSign());
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (!resultSet.next()) {
@@ -107,7 +84,7 @@ public class JdbcCurrencyDao implements CurrencyDao {
 
         } catch (SQLException e) {
             if (isUniqueConstraintViolation(e)) {
-                throw new CurrencyAlreadyExistsException("Currency with code %s already exists.".formatted(currency.code()));
+                throw new CurrencyAlreadyExistsException("Currency with code %s already exists.".formatted(currency.getCode()));
             }
             throw new DatabaseException("Failed to save currency into database", e);
         }

@@ -1,7 +1,7 @@
 package ru.prplhd.currencyexchange.service;
 
-import ru.prplhd.currencyexchange.dao.ExchangeRateDao;
-import ru.prplhd.currencyexchange.dto.ExchangeDto;
+import ru.prplhd.currencyexchange.dao.JdbcExchangeRateDao;
+import ru.prplhd.currencyexchange.dto.ExchangeResponseDto;
 import ru.prplhd.currencyexchange.dto.ExchangeRequestDto;
 import ru.prplhd.currencyexchange.exception.ExchangeRateNotFoundException;
 import ru.prplhd.currencyexchange.mapper.ExchangeMapper;
@@ -18,13 +18,13 @@ public class ExchangeService {
     private static final String REFERENCE_CURRENCY_CODE = "USD";
     private static final int CONVERTED_AMOUNT_SCALE = 6;
     private static final int EXCHANGE_RATE_SCALE = 6;
-    private final ExchangeRateDao exchangeRateDao;
+    private final JdbcExchangeRateDao jdbcExchangeRateDao;
 
-    public ExchangeService(ExchangeRateDao exchangeRateDao) {
-        this.exchangeRateDao = exchangeRateDao;
+    public ExchangeService(JdbcExchangeRateDao jdbcExchangeRateDao) {
+        this.jdbcExchangeRateDao = jdbcExchangeRateDao;
     }
 
-    public ExchangeDto getExchange(ExchangeRequestDto exchangeRequestDto) {
+    public ExchangeResponseDto getExchange(ExchangeRequestDto exchangeRequestDto) {
         ExchangeValidator.validateExchangeRequestDto(exchangeRequestDto);
 
         String fromCurrencyCode = exchangeRequestDto.fromCurrencyCode();
@@ -47,44 +47,44 @@ public class ExchangeService {
     }
 
     private ExchangeRateResult getExchangeRateResult(String baseCurrencyCode, String targetCurrencyCode) {
-        Optional<ExchangeRate> optDirectExchangeRate = exchangeRateDao.findByCurrencyPairCode(baseCurrencyCode, targetCurrencyCode);
+        Optional<ExchangeRate> optDirectExchangeRate = jdbcExchangeRateDao.findByCodes(baseCurrencyCode, targetCurrencyCode);
         if (optDirectExchangeRate.isPresent()) {
             ExchangeRate directExchangeRate = optDirectExchangeRate.get();
 
             return new ExchangeRateResult(
-                    directExchangeRate.baseCurrency(),
-                    directExchangeRate.targetCurrency(),
-                    directExchangeRate.rate()
+                    directExchangeRate.getBaseCurrency(),
+                    directExchangeRate.getTargetCurrency(),
+                    directExchangeRate.getRate()
             );
         }
 
-        Optional<ExchangeRate> optReverseExchangeRate = exchangeRateDao.findByCurrencyPairCode(targetCurrencyCode, baseCurrencyCode);
+        Optional<ExchangeRate> optReverseExchangeRate = jdbcExchangeRateDao.findByCodes(targetCurrencyCode, baseCurrencyCode);
         if (optReverseExchangeRate.isPresent()) {
             ExchangeRate reverseExchangeRate = optReverseExchangeRate.get();
-            BigDecimal reverseRate = reverseExchangeRate.rate();
+            BigDecimal reverseRate = reverseExchangeRate.getRate();
             BigDecimal rate = BigDecimal.ONE.divide(reverseRate, EXCHANGE_RATE_SCALE, RoundingMode.HALF_UP);
 
             return new ExchangeRateResult(
-                    reverseExchangeRate.targetCurrency(),
-                    reverseExchangeRate.baseCurrency(),
+                    reverseExchangeRate.getTargetCurrency(),
+                    reverseExchangeRate.getBaseCurrency(),
                     rate
             );
         }
 
-        Optional<ExchangeRate> optReferenceToBaseExchangeRate = exchangeRateDao.findByCurrencyPairCode(REFERENCE_CURRENCY_CODE, baseCurrencyCode);
-        Optional<ExchangeRate> optReferenceToTargetExchangeRate = exchangeRateDao.findByCurrencyPairCode(REFERENCE_CURRENCY_CODE, targetCurrencyCode);
+        Optional<ExchangeRate> optReferenceToBaseExchangeRate = jdbcExchangeRateDao.findByCodes(REFERENCE_CURRENCY_CODE, baseCurrencyCode);
+        Optional<ExchangeRate> optReferenceToTargetExchangeRate = jdbcExchangeRateDao.findByCodes(REFERENCE_CURRENCY_CODE, targetCurrencyCode);
         if(optReferenceToBaseExchangeRate.isPresent() && optReferenceToTargetExchangeRate.isPresent()) {
             ExchangeRate usdToBaseExchangeRate = optReferenceToBaseExchangeRate.get();
             ExchangeRate usdToTargetExchangeRate = optReferenceToTargetExchangeRate.get();
 
-            BigDecimal baseRate = usdToBaseExchangeRate.rate();
-            BigDecimal targetRate = usdToTargetExchangeRate.rate();
+            BigDecimal baseRate = usdToBaseExchangeRate.getRate();
+            BigDecimal targetRate = usdToTargetExchangeRate.getRate();
 
             BigDecimal rate = targetRate.divide(baseRate, EXCHANGE_RATE_SCALE, RoundingMode.HALF_UP);
 
             return new ExchangeRateResult(
-                    usdToBaseExchangeRate.targetCurrency(),
-                    usdToTargetExchangeRate.targetCurrency(),
+                    usdToBaseExchangeRate.getTargetCurrency(),
+                    usdToTargetExchangeRate.getTargetCurrency(),
                     rate
             );
         }
