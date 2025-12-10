@@ -23,7 +23,7 @@ public final class CurrencyMapper {
                 .toList();
     }
 
-    public static Currency fromCreateDto(CurrencyRequestDto dto) {
+    public static Currency toModel(CurrencyRequestDto dto) {
         return new Currency(
                 null,
                 dto.code(),

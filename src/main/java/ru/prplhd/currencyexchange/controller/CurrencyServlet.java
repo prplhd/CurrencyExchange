@@ -10,7 +10,10 @@ import ru.prplhd.currencyexchange.dao.CurrencyDao;
 import ru.prplhd.currencyexchange.dao.JdbcCurrencyDao;
 import ru.prplhd.currencyexchange.dto.CurrencyResponseDto;
 import ru.prplhd.currencyexchange.exception.BadRequestException;
-import ru.prplhd.currencyexchange.service.CurrencyService;
+import ru.prplhd.currencyexchange.exception.CurrencyNotFoundException;
+import ru.prplhd.currencyexchange.mapper.CurrencyMapper;
+import ru.prplhd.currencyexchange.model.Currency;
+import ru.prplhd.currencyexchange.validation.CurrencyValidator;
 import ru.prplhd.currencyexchange.webutil.JsonResponseWriter;
 import ru.prplhd.currencyexchange.webutil.ResponseWriter;
 
@@ -20,21 +23,25 @@ import java.util.Locale;
 @WebServlet("/currency/*")
 public class CurrencyServlet extends HttpServlet {
     private final ResponseWriter responseWriter =  new JsonResponseWriter();
-    private CurrencyService currencyService;
+    private CurrencyDao currencyDao;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        CurrencyDao currencyDao = new JdbcCurrencyDao();
-        currencyService = new CurrencyService(currencyDao);
+        currencyDao = new JdbcCurrencyDao();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String code = extractCurrencyCode(request);
-        CurrencyResponseDto currencyDto = currencyService.getCurrency(code);
+        CurrencyValidator.validateCurrencyCode(code);
+
+        Currency currency = currencyDao.findByCode(code)
+                .orElseThrow(() -> new CurrencyNotFoundException("Currency with code '%s' not found".formatted(code)));
+        CurrencyResponseDto currencyResponseDto = CurrencyMapper.toDto(currency);
+
         responseWriter.write(
-                currencyDto,
+                currencyResponseDto,
                 response,
                 HttpServletResponse.SC_OK
         );

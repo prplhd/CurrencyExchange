@@ -10,7 +10,9 @@ import ru.prplhd.currencyexchange.dao.CurrencyDao;
 import ru.prplhd.currencyexchange.dao.JdbcCurrencyDao;
 import ru.prplhd.currencyexchange.dto.CurrencyRequestDto;
 import ru.prplhd.currencyexchange.dto.CurrencyResponseDto;
-import ru.prplhd.currencyexchange.service.CurrencyService;
+import ru.prplhd.currencyexchange.mapper.CurrencyMapper;
+import ru.prplhd.currencyexchange.model.Currency;
+import ru.prplhd.currencyexchange.validation.CurrencyValidator;
 import ru.prplhd.currencyexchange.webutil.JsonResponseWriter;
 import ru.prplhd.currencyexchange.webutil.RequestParamExtractor;
 import ru.prplhd.currencyexchange.webutil.ResponseWriter;
@@ -21,20 +23,21 @@ import java.util.List;
 @WebServlet("/currencies")
 public class CurrenciesServlet extends HttpServlet {
     private final ResponseWriter responseWriter =  new JsonResponseWriter();
-    private CurrencyService currencyService;
+    private CurrencyDao currencyDao;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        CurrencyDao currencyDao = new JdbcCurrencyDao();
-        currencyService = new CurrencyService(currencyDao);
+        currencyDao = new JdbcCurrencyDao();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        List<CurrencyResponseDto> currencyDtos = currencyService.getAllCurrencies();
+        List<Currency> currencies = currencyDao.findAll();
+        List<CurrencyResponseDto> currencyResponseDtos = CurrencyMapper.toDtos(currencies);
+
         responseWriter.write(
-                currencyDtos,
+                currencyResponseDtos,
                 response,
                 HttpServletResponse.SC_OK
         );
@@ -42,16 +45,20 @@ public class CurrenciesServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        CurrencyRequestDto currencyRequestDto = createCurrencyDto(request);
-        CurrencyResponseDto currencyDto = currencyService.createCurrency(currencyRequestDto);
+        CurrencyRequestDto currencyRequestDto = createCurrencyRequestDto(request);
+        CurrencyValidator.validateCurrencyRequestDto(currencyRequestDto);
+
+        Currency currency = currencyDao.save(CurrencyMapper.toModel(currencyRequestDto));
+        CurrencyResponseDto currencyResponseDto = CurrencyMapper.toDto(currency);
+
         responseWriter.write(
-                currencyDto,
+                currencyResponseDto,
                 response,
                 HttpServletResponse.SC_CREATED
         );
     }
 
-    private CurrencyRequestDto createCurrencyDto(HttpServletRequest request) {
+    private CurrencyRequestDto createCurrencyRequestDto(HttpServletRequest request) {
         String name = RequestParamExtractor.requiredParam(request, "name");
         String code = RequestParamExtractor.requiredUppercaseParam(request, "code");
         String sign = RequestParamExtractor.optionalParam(request, "sign");

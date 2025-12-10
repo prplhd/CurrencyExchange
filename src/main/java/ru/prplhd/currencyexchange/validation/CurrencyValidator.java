@@ -19,7 +19,7 @@ public final class CurrencyValidator {
         }
     }
 
-    public static void validateCreateCurrencyDto(CurrencyRequestDto currencyRequestDto) {
+    public static void validateCurrencyRequestDto(CurrencyRequestDto currencyRequestDto) {
         String name = currencyRequestDto.name();
         if (name.length() < MIN_CURRENCY_NAME_LENGTH || name.length() > MAX_CURRENCY_NAME_LENGTH) {
             throw new ValidationException("Invalid name length. Currency name must be between %d and %d characters."
