@@ -1,3 +1,3 @@
 package ru.prplhd.currencyexchange.dto;
 
-public record ExchangeRequestDto(String fromCurrencyCode, String toCurrencyCode, String amount) {}
+public record ExchangeRequestDto(String baseCurrencyCode, String targetCurrencyCode, String amount) {}

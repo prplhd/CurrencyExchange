@@ -17,7 +17,13 @@ public final class RequestParamExtractor {
     }
 
     public static String requiredUppercaseParam(HttpServletRequest request, String paramName) {
-        return requiredParam(request, paramName).toUpperCase(Locale.ROOT);
+        String value = requiredParam(request, paramName);
+        String uppercaseValue = value.toUpperCase(Locale.ROOT);
+        if (!uppercaseValue.equals(value)) {
+            throw new BadRequestException("Invalid value for parameter '%s'. Must be uppercase, but was '%s'."
+                    .formatted(paramName, value));
+        }
+        return value;
     }
 
     public static String optionalParam(HttpServletRequest request, String paramName) {

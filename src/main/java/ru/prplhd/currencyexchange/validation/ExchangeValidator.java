@@ -12,10 +12,10 @@ public final class ExchangeValidator {
     private ExchangeValidator() {}
 
     public static void validateExchangeRequestDto(ExchangeRequestDto exchangeRequestDto) {
-        String baseCurrencyCode = exchangeRequestDto.fromCurrencyCode();
+        String baseCurrencyCode = exchangeRequestDto.baseCurrencyCode();
         CurrencyValidator.validateCurrencyCode(baseCurrencyCode);
 
-        String targetCurrencyCode = exchangeRequestDto.toCurrencyCode();
+        String targetCurrencyCode = exchangeRequestDto.targetCurrencyCode();
         CurrencyValidator.validateCurrencyCode(targetCurrencyCode);
 
         if (baseCurrencyCode.equals(targetCurrencyCode)) {

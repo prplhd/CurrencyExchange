@@ -18,7 +18,6 @@ import ru.prplhd.currencyexchange.webutil.JsonResponseWriter;
 import ru.prplhd.currencyexchange.webutil.ResponseWriter;
 
 import java.io.IOException;
-import java.util.Locale;
 
 @WebServlet("/currency/*")
 public class CurrencyServlet extends HttpServlet {
@@ -52,6 +51,6 @@ public class CurrencyServlet extends HttpServlet {
         if (pathInfo == null || pathInfo.equals("/")) {
             throw new BadRequestException("Invalid currency path. Please use /currency/{CODE}");
         }
-        return pathInfo.substring(1).trim().toUpperCase(Locale.ROOT);
+        return pathInfo.substring(1).trim();
     }
 }

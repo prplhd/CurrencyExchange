@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import ru.prplhd.currencyexchange.dao.ExchangeRateDao;
 import ru.prplhd.currencyexchange.dao.JdbcExchangeRateDao;
 import ru.prplhd.currencyexchange.dto.ExchangeResponseDto;
 import ru.prplhd.currencyexchange.dto.ExchangeRequestDto;
@@ -25,8 +26,8 @@ public class ExchangeServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        JdbcExchangeRateDao jdbcExchangeRateDao = new JdbcExchangeRateDao();
-        exchangeService = new ExchangeService(jdbcExchangeRateDao);
+        ExchangeRateDao exchangeRateDao = new JdbcExchangeRateDao();
+        exchangeService = new ExchangeService(exchangeRateDao);
     }
 
     @Override

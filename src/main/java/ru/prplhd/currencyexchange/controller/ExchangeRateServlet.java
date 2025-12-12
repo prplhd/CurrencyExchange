@@ -25,7 +25,6 @@ import ru.prplhd.currencyexchange.webutil.JsonResponseWriter;
 import ru.prplhd.currencyexchange.webutil.ResponseWriter;
 
 import java.io.IOException;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 @WebServlet("/exchangeRate/*")
@@ -88,7 +87,7 @@ public class ExchangeRateServlet extends HttpServlet {
             throw new BadRequestException("Invalid currency path. Please use /exchangeRate/{CODE}{CODE}");
         }
 
-        String currencyPairCode = pathInfo.substring(1).trim().toUpperCase(Locale.ROOT);
+        String currencyPairCode = pathInfo.substring(1).trim();
 
         String baseCurrencyCode = currencyPairCode.substring(0, CURRENCY_CODE_LENGTH);
         CurrencyValidator.validateCurrencyCode(baseCurrencyCode);
