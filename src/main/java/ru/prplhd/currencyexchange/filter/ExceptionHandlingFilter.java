@@ -14,8 +14,8 @@ import ru.prplhd.currencyexchange.exception.DatabaseException;
 import ru.prplhd.currencyexchange.exception.ExchangeRateAlreadyExistsException;
 import ru.prplhd.currencyexchange.exception.ExchangeRateNotFoundException;
 import ru.prplhd.currencyexchange.exception.ValidationException;
-import ru.prplhd.currencyexchange.webutil.JsonResponseWriter;
-import ru.prplhd.currencyexchange.webutil.ResponseWriter;
+import ru.prplhd.currencyexchange.webutil.response.JsonResponseWriter;
+import ru.prplhd.currencyexchange.webutil.response.ResponseWriter;
 
 import java.io.IOException;
 

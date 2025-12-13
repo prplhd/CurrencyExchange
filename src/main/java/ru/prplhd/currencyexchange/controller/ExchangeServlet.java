@@ -11,9 +11,9 @@ import ru.prplhd.currencyexchange.dao.JdbcExchangeRateDao;
 import ru.prplhd.currencyexchange.dto.ExchangeResponseDto;
 import ru.prplhd.currencyexchange.dto.ExchangeRequestDto;
 import ru.prplhd.currencyexchange.service.ExchangeService;
-import ru.prplhd.currencyexchange.webutil.JsonResponseWriter;
-import ru.prplhd.currencyexchange.webutil.RequestParamExtractor;
-import ru.prplhd.currencyexchange.webutil.ResponseWriter;
+import ru.prplhd.currencyexchange.webutil.response.JsonResponseWriter;
+import ru.prplhd.currencyexchange.webutil.request.RequestParamExtractor;
+import ru.prplhd.currencyexchange.webutil.response.ResponseWriter;
 
 import java.io.IOException;
 

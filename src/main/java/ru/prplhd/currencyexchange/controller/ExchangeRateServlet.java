@@ -21,8 +21,8 @@ import ru.prplhd.currencyexchange.model.ExchangeRate;
 import ru.prplhd.currencyexchange.service.ExchangeRateService;
 import ru.prplhd.currencyexchange.validation.CurrencyValidator;
 import ru.prplhd.currencyexchange.validation.ExchangeRateValidator;
-import ru.prplhd.currencyexchange.webutil.JsonResponseWriter;
-import ru.prplhd.currencyexchange.webutil.ResponseWriter;
+import ru.prplhd.currencyexchange.webutil.response.JsonResponseWriter;
+import ru.prplhd.currencyexchange.webutil.response.ResponseWriter;
 
 import java.io.IOException;
 import java.util.stream.Collectors;

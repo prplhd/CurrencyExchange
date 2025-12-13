@@ -1,4 +1,4 @@
-package ru.prplhd.currencyexchange.webutil;
+package ru.prplhd.currencyexchange.webutil.request;
 
 import jakarta.servlet.http.HttpServletRequest;
 import ru.prplhd.currencyexchange.exception.BadRequestException;

@@ -14,8 +14,8 @@ import ru.prplhd.currencyexchange.exception.CurrencyNotFoundException;
 import ru.prplhd.currencyexchange.mapper.CurrencyMapper;
 import ru.prplhd.currencyexchange.model.Currency;
 import ru.prplhd.currencyexchange.validation.CurrencyValidator;
-import ru.prplhd.currencyexchange.webutil.JsonResponseWriter;
-import ru.prplhd.currencyexchange.webutil.ResponseWriter;
+import ru.prplhd.currencyexchange.webutil.response.JsonResponseWriter;
+import ru.prplhd.currencyexchange.webutil.response.ResponseWriter;
 
 import java.io.IOException;
 

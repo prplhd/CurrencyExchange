@@ -1,4 +1,4 @@
-package ru.prplhd.currencyexchange.webutil;
+package ru.prplhd.currencyexchange.webutil.response;
 
 import com.google.gson.Gson;
 import jakarta.servlet.http.HttpServletResponse;
