@@ -1,5 +1,6 @@
 package ru.prplhd.currencyexchange.service;
 
+import lombok.extern.slf4j.Slf4j;
 import ru.prplhd.currencyexchange.dao.CurrencyDao;
 import ru.prplhd.currencyexchange.dao.ExchangeRateDao;
 import ru.prplhd.currencyexchange.dto.ExchangeRateRequestDto;
@@ -11,6 +12,7 @@ import ru.prplhd.currencyexchange.validation.ExchangeRateValidator;
 
 import java.math.BigDecimal;
 
+@Slf4j
 public class ExchangeRateService {
     private final CurrencyDao currencyDao;
     private final ExchangeRateDao exchangeRateDao;
@@ -23,15 +25,25 @@ public class ExchangeRateService {
     public ExchangeRate createExchangeRate(ExchangeRateRequestDto exchangeRateRequestDto) {
         ExchangeRate exchangeRate = extractExchangeRate(exchangeRateRequestDto);
 
-        return exchangeRateDao.save(exchangeRate);
+        ExchangeRate saved = exchangeRateDao.save(exchangeRate);
+
+        log.info("Exchange rate created: base={}, target={}, rate={}",
+                saved.getBaseCurrency().getCode(), saved.getTargetCurrency().getCode(), saved.getRate());
+
+        return saved;
     }
 
     public ExchangeRate updateExchangeRate(ExchangeRateRequestDto exchangeRateRequestDto) {
         ExchangeRate exchangeRate = extractExchangeRate(exchangeRateRequestDto);
 
-        return exchangeRateDao.update(exchangeRate)
+        ExchangeRate updated = exchangeRateDao.update(exchangeRate)
                 .orElseThrow(() -> new ExchangeRateNotFoundException("Exchange rate with codes '%s' and '%s' not found"
                         .formatted(exchangeRate.getBaseCurrency().getCode(), exchangeRate.getTargetCurrency().getCode())));
+
+        log.info("Exchange rate updated: base={}, target={}, rate={}",
+                updated.getBaseCurrency().getCode(), updated.getTargetCurrency().getCode(), updated.getRate());
+
+        return updated;
     }
 
     private ExchangeRate extractExchangeRate(ExchangeRateRequestDto exchangeRateRequestDto) {

@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import ru.prplhd.currencyexchange.dao.CurrencyDao;
 import ru.prplhd.currencyexchange.dao.JdbcCurrencyDao;
 import ru.prplhd.currencyexchange.dto.CurrencyRequestDto;
@@ -20,6 +21,7 @@ import ru.prplhd.currencyexchange.webutil.response.ResponseWriter;
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @WebServlet("/currencies")
 public class CurrenciesServlet extends HttpServlet {
     private final ResponseWriter responseWriter =  new JsonResponseWriter();
@@ -49,6 +51,10 @@ public class CurrenciesServlet extends HttpServlet {
         CurrencyValidator.validateCurrencyRequestDto(currencyRequestDto);
 
         Currency currency = currencyDao.save(CurrencyMapper.toModel(currencyRequestDto));
+
+        log.info("Currency created: code={}, name={}, sign={}",
+                currency.getCode(), currency.getName(), currency.getSign());
+
         CurrencyResponseDto currencyResponseDto = CurrencyMapper.toDto(currency);
 
         responseWriter.write(
