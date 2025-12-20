@@ -21,4 +21,8 @@ public final class ConnectionProvider {
     public static Connection getConnection() throws SQLException {
         return HIKARI_DATA_SOURCE.getConnection();
     }
+
+    public static void shutdown() {
+        HIKARI_DATA_SOURCE.close();
+    }
 }

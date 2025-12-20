@@ -12,14 +12,21 @@ import java.sql.SQLException;
 
 @Slf4j
 @WebListener
-public class DatabaseHealthCheckListener implements ServletContextListener {
+public class DatabaseLifecycleListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         verifyDatabaseConnection();
     }
 
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+        ConnectionProvider.shutdown();
+        System.out.println("DB pool shutdown complete");
+    }
+
     private void verifyDatabaseConnection() {
         try (Connection connection = ConnectionProvider.getConnection()) {
+            log.info("DB health check OK");
 
         } catch (SQLException | ExceptionInInitializerError e) {
             log.error("DB health check failed", e);
