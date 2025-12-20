@@ -1,13 +1,15 @@
 package ru.prplhd.currencyexchange.mapper;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ru.prplhd.currencyexchange.dto.CurrencyResponseDto;
 import ru.prplhd.currencyexchange.dto.ExchangeRateResponseDto;
 import ru.prplhd.currencyexchange.model.ExchangeRate;
 
 import java.util.List;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ExchangeRateMapper {
-    private ExchangeRateMapper() {}
 
     public static ExchangeRateResponseDto toDto(ExchangeRate exchangeRate) {
         CurrencyResponseDto baseCurrencyDto = CurrencyMapper.toDto(exchangeRate.getBaseCurrency());

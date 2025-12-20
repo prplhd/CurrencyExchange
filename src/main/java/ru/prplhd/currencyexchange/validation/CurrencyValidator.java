@@ -1,10 +1,13 @@
 package ru.prplhd.currencyexchange.validation;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ru.prplhd.currencyexchange.dto.CurrencyRequestDto;
 import ru.prplhd.currencyexchange.exception.ValidationException;
 
 import java.util.regex.Pattern;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CurrencyValidator {
     private static final Pattern CURRENCY_CODE_PATTERN = Pattern.compile("^[A-Z]{3}$");
     private static final Pattern CURRENCY_NAME_PATTERN = Pattern.compile("^[A-Za-z ]+$");
@@ -12,8 +15,6 @@ public final class CurrencyValidator {
     private static final int MIN_CURRENCY_NAME_LENGTH = 3;
     private static final int MAX_CURRENCY_NAME_LENGTH = 50;
     private static final int MAX_CURRENCY_SIGN_LENGTH = 3;
-
-    private CurrencyValidator() {}
 
     public static void validateCurrencyCode(String code) {
         if (!CURRENCY_CODE_PATTERN.matcher(code).matches()) {

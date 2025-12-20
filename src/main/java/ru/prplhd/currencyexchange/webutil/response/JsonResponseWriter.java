@@ -2,6 +2,7 @@ package ru.prplhd.currencyexchange.webutil.response;
 
 import com.google.gson.Gson;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
 public final class JsonResponseWriter implements ResponseWriter {

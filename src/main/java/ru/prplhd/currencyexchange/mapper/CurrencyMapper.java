@@ -1,12 +1,14 @@
 package ru.prplhd.currencyexchange.mapper;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ru.prplhd.currencyexchange.dto.CurrencyRequestDto;
 import ru.prplhd.currencyexchange.dto.CurrencyResponseDto;
 import ru.prplhd.currencyexchange.model.Currency;
 import java.util.List;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CurrencyMapper {
-    private CurrencyMapper() {}
 
     public static CurrencyResponseDto toDto(Currency currency) {
         return new CurrencyResponseDto(

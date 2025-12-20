@@ -1,12 +1,14 @@
 package ru.prplhd.currencyexchange.webutil.request;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ru.prplhd.currencyexchange.exception.BadRequestException;
 
 import java.util.Locale;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RequestParamExtractor {
-    private  RequestParamExtractor() {}
 
     public static String requiredParam(HttpServletRequest request, String paramName) {
         String value = request.getParameter(paramName);

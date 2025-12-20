@@ -1,15 +1,16 @@
 package ru.prplhd.currencyexchange.validation;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ru.prplhd.currencyexchange.dto.ExchangeRequestDto;
 import ru.prplhd.currencyexchange.exception.ValidationException;
 
 import java.math.BigDecimal;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ExchangeValidator {
     private static final int MAX_AMOUNT_FRACTIONAL_PART_DIGITS = 6;
     private static final int MAX_AMOUNT_INTEGER_PART_DIGITS = 12;
-
-    private ExchangeValidator() {}
 
     public static void validateExchangeRequestDto(ExchangeRequestDto exchangeRequestDto) {
         String baseCurrencyCode = exchangeRequestDto.baseCurrencyCode();
