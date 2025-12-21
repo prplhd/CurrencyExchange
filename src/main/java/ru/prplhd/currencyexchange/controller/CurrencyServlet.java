@@ -37,7 +37,7 @@ public class CurrencyServlet extends HttpServlet {
 
         Currency currency = currencyDao.findByCode(code)
                 .orElseThrow(() -> new CurrencyNotFoundException("Currency with code '%s' not found".formatted(code)));
-        CurrencyResponseDto currencyResponseDto = CurrencyMapper.toDto(currency);
+        CurrencyResponseDto currencyResponseDto = CurrencyMapper.INSTANCE.toDto(currency);
 
         responseWriter.write(
                 currencyResponseDto,

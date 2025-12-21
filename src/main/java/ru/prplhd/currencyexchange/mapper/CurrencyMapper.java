@@ -1,36 +1,18 @@
 package ru.prplhd.currencyexchange.mapper;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 import ru.prplhd.currencyexchange.dto.CurrencyRequestDto;
 import ru.prplhd.currencyexchange.dto.CurrencyResponseDto;
 import ru.prplhd.currencyexchange.model.Currency;
-import java.util.List;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class CurrencyMapper {
+@Mapper
+public interface CurrencyMapper {
+    CurrencyMapper INSTANCE = Mappers.getMapper( CurrencyMapper.class );
 
-    public static CurrencyResponseDto toDto(Currency currency) {
-        return new CurrencyResponseDto(
-                currency.getId(),
-                currency.getCode(),
-                currency.getName(),
-                currency.getSign()
-        );
-    }
+    CurrencyResponseDto toDto(Currency currency);
 
-    public static List<CurrencyResponseDto> toDtos(List<Currency> currencies) {
-        return currencies.stream()
-                .map(CurrencyMapper::toDto)
-                .toList();
-    }
-
-    public static Currency toModel(CurrencyRequestDto dto) {
-        return new Currency(
-                null,
-                dto.code(),
-                dto.name(),
-                dto.sign()
-        );
-    }
+    @Mapping(target = "id",  ignore = true)
+    Currency toEntity(CurrencyRequestDto dto);
 }

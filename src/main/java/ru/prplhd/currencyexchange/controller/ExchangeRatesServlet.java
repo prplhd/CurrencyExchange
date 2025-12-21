@@ -15,8 +15,8 @@ import ru.prplhd.currencyexchange.dto.ExchangeRateResponseDto;
 import ru.prplhd.currencyexchange.mapper.ExchangeRateMapper;
 import ru.prplhd.currencyexchange.model.ExchangeRate;
 import ru.prplhd.currencyexchange.service.ExchangeRateService;
-import ru.prplhd.currencyexchange.webutil.response.JsonResponseWriter;
 import ru.prplhd.currencyexchange.webutil.request.RequestParamExtractor;
+import ru.prplhd.currencyexchange.webutil.response.JsonResponseWriter;
 import ru.prplhd.currencyexchange.webutil.response.ResponseWriter;
 
 import java.io.IOException;
@@ -39,7 +39,9 @@ public class ExchangeRatesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         List<ExchangeRate> exchangeRates = exchangeRateDao.findAll();
-        List<ExchangeRateResponseDto> exchangeRateResponseDtos = ExchangeRateMapper.toDtos(exchangeRates);
+        List<ExchangeRateResponseDto> exchangeRateResponseDtos = exchangeRates.stream()
+                .map(ExchangeRateMapper.INSTANCE::toDto)
+                .toList();
 
         responseWriter.write(
                 exchangeRateResponseDtos,
@@ -52,7 +54,7 @@ public class ExchangeRatesServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         ExchangeRateRequestDto exchangeRateRequestDto = createExchangeRateRequestDto(request);
         ExchangeRate exchangeRate = exchangeRateService.createExchangeRate(exchangeRateRequestDto);
-        ExchangeRateResponseDto exchangeRateResponseDto = ExchangeRateMapper.toDto(exchangeRate);
+        ExchangeRateResponseDto exchangeRateResponseDto = ExchangeRateMapper.INSTANCE.toDto(exchangeRate);
 
         responseWriter.write(
                 exchangeRateResponseDto,

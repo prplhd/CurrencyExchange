@@ -14,8 +14,8 @@ import ru.prplhd.currencyexchange.dto.CurrencyResponseDto;
 import ru.prplhd.currencyexchange.mapper.CurrencyMapper;
 import ru.prplhd.currencyexchange.model.Currency;
 import ru.prplhd.currencyexchange.validation.CurrencyValidator;
-import ru.prplhd.currencyexchange.webutil.response.JsonResponseWriter;
 import ru.prplhd.currencyexchange.webutil.request.RequestParamExtractor;
+import ru.prplhd.currencyexchange.webutil.response.JsonResponseWriter;
 import ru.prplhd.currencyexchange.webutil.response.ResponseWriter;
 
 import java.io.IOException;
@@ -36,7 +36,9 @@ public class CurrenciesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         List<Currency> currencies = currencyDao.findAll();
-        List<CurrencyResponseDto> currencyResponseDtos = CurrencyMapper.toDtos(currencies);
+        List<CurrencyResponseDto> currencyResponseDtos = currencies.stream()
+                .map(CurrencyMapper.INSTANCE::toDto)
+                .toList();
 
         responseWriter.write(
                 currencyResponseDtos,
@@ -50,12 +52,12 @@ public class CurrenciesServlet extends HttpServlet {
         CurrencyRequestDto currencyRequestDto = createCurrencyRequestDto(request);
         CurrencyValidator.validateCurrencyRequestDto(currencyRequestDto);
 
-        Currency currency = currencyDao.save(CurrencyMapper.toModel(currencyRequestDto));
+        Currency currency = currencyDao.save(CurrencyMapper.INSTANCE.toEntity(currencyRequestDto));
 
         log.info("Currency created: code={}, name={}, sign={}",
                 currency.getCode(), currency.getName(), currency.getSign());
 
-        CurrencyResponseDto currencyResponseDto = CurrencyMapper.toDto(currency);
+        CurrencyResponseDto currencyResponseDto = CurrencyMapper.INSTANCE.toDto(currency);
 
         responseWriter.write(
                 currencyResponseDto,

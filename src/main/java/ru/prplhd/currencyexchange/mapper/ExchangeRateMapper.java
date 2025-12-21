@@ -1,30 +1,13 @@
 package ru.prplhd.currencyexchange.mapper;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import ru.prplhd.currencyexchange.dto.CurrencyResponseDto;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 import ru.prplhd.currencyexchange.dto.ExchangeRateResponseDto;
 import ru.prplhd.currencyexchange.model.ExchangeRate;
 
-import java.util.List;
+@Mapper(uses = CurrencyMapper.class)
+public interface ExchangeRateMapper {
+    ExchangeRateMapper INSTANCE = Mappers.getMapper( ExchangeRateMapper.class );
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class ExchangeRateMapper {
-
-    public static ExchangeRateResponseDto toDto(ExchangeRate exchangeRate) {
-        CurrencyResponseDto baseCurrencyDto = CurrencyMapper.toDto(exchangeRate.getBaseCurrency());
-        CurrencyResponseDto targetCurrencyDto = CurrencyMapper.toDto(exchangeRate.getTargetCurrency());
-        return new ExchangeRateResponseDto(
-          exchangeRate.getId(),
-          baseCurrencyDto,
-          targetCurrencyDto,
-          exchangeRate.getRate()
-        );
-    }
-
-    public static List<ExchangeRateResponseDto> toDtos(List<ExchangeRate> exchangeRates) {
-        return exchangeRates.stream()
-                .map(ExchangeRateMapper::toDto)
-                .toList();
-    }
+    ExchangeRateResponseDto toDto(ExchangeRate exchangeRate);
 }

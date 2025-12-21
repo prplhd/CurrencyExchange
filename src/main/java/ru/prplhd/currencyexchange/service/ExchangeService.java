@@ -40,8 +40,8 @@ public class ExchangeService {
         convertedAmount = convertedAmount.setScale(CONVERTED_AMOUNT_SCALE, RoundingMode.HALF_UP);
 
         return new ExchangeResponseDto(
-                CurrencyMapper.toDto(baseCurrency),
-                CurrencyMapper.toDto(targetCurrency),
+                CurrencyMapper.INSTANCE.toDto(baseCurrency),
+                CurrencyMapper.INSTANCE.toDto(targetCurrency),
                 rate,
                 amount,
                 convertedAmount
