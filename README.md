@@ -31,7 +31,7 @@ REST API для описания валют, обменных курсов и р
 - Расчёт конвертации:
     - по прямому курсу (A→B);
     - по обратному курсу (если есть только B→A);
-    - через USD как промежуточную валюту (если есть A→USD и B→USD).
+    - через USD как промежуточную валюту (если есть USD→A и USD→B).
 - Единый формат ответа при ошибках:  
   `{"message": "…описание ошибки…"}`.
 
@@ -45,7 +45,10 @@ REST API для описания валют, обменных курсов и р
 - **Сервер приложений:** Apache Tomcat 11+
 - **База данных:** SQLite
 - **Доступ к БД:** JDBC
+- **Пул соединений:** HikariCP
 - **JSON:** Gson
+- **Логирование:** SLF4J + Logback
+- **Сокращение шаблонного кода:** Lombok
 - **Фронтенд для тестирования:** статический HTML + jQuery
 
 ---
@@ -57,8 +60,14 @@ REST API для описания валют, обменных курсов и р
 - JDK 21 или новее
 - Maven 3.9+
 - Apache Tomcat 11+ (или другой контейнер сервлетов с поддержкой Jakarta Servlet 6)
-- SQLite JDBC-драйвер (подтягивается как Maven-зависимость)
-- Gson для работы с JSON (подтягивается как Maven-зависимость)
+
+Следующие подтягиваются как Maven-зависимости:
+- SQLite JDBC-драйвер
+- Gson для работы с JSON
+- HikariCP для работы с пулом соединений
+- SLF4J + Logback для логирования
+- Lombok (нужен включенный Annotation Processing в IDE)
+- MapStruct (нужен Annotation Processor для генерации мапперов)
 ---
 
 ## Подключение базы данных
@@ -73,7 +82,7 @@ REST API для описания валют, обменных курсов и р
 Пример содержимого:
 
 ```properties
-db.url=jdbc:sqlite:/absolute/path/to/currency_exchange.db
+db.url=jdbc:sqlite:/absolute/path/to/currency_exchange.db?mode=rw
 db.driver=org.sqlite.JDBC
 ```
 
@@ -82,10 +91,10 @@ db.driver=org.sqlite.JDBC
 1. Убедитесь, что файл `currency_exchange.db` находится в понятном месте  
    (можно оставить в корне проекта или перенести в отдельную папку).
 
-2. В `db.url` пропишите корректный абсолютный путь к файлу базы, например:
+2. В `db.url` пропишите корректный абсолютный путь к файлу базы, сохраняя в конце пути `?mode=rw` для корректной работы приложения, например:
 
    ```text
-   jdbc:sqlite:/home/user/CurrencyExchange/currency_exchange.db
+   jdbc:sqlite:/home/user/CurrencyExchange/currency_exchange.db?mode=rw
    jdbc:sqlite:C:/dev/CurrencyExchange/currency_exchange.db
    ```
 
@@ -99,7 +108,6 @@ db.driver=org.sqlite.JDBC
 
 ```bash
 git clone https://github.com/prplhd/CurrencyExchange.git
-cd CurrencyExchange
 ```
 
 ### 2. Настройка `db.properties`
@@ -116,29 +124,13 @@ mvn clean package
 
 ### 4. Деплой в Tomcat
 
-Есть два основных варианта.
-
-#### Вариант 1: через IntelliJ IDEA
-
-- Настроить локальный Tomcat.
-- Добавить артефакт `war exploded`.
-- Задать нужный `context path` (часто `/` по умолчанию).
-
-#### Вариант 2: вручную
-
 1. Скопировать `target/CurrencyExchange.war` в каталог `webapps` Tomcat.
 2. Запустить (или перезапустить) Tomcat.
 3. Приложение станет доступно по адресу, например:
     - `http://localhost:8080/CurrencyExchange` — если `context path` равен имени WAR;
     - `http://localhost:8080/` — если приложение развёрнуто как корневое (ROOT).
 
-Во всех примерах ниже предполагается базовый URL:
-
-```text
-http://localhost:8080
-```
-
-Если у приложения есть `context path` (`/CurrencyExchange`), добавьте его после порта.
+Если у приложения есть `context path` ( например `/CurrencyExchange`), добавьте его после порта.
 
 ---
 
@@ -149,25 +141,35 @@ http://localhost:8080
 ```text
 CurrencyExchange/
 ├── pom.xml
-├── currency_exchange.db                 # Файл базы данных SQLite
+├── currency_exchange.db                      # Файл базы данных SQLite
 └── src/
     └── main/
         ├── java/
         │   └── ru/prplhd/currencyexchange/
-        │       ├── controller/          # Сервлеты
-        │       ├── service/             # Бизнес-логика
-        │       ├── dao/                 # Доступ к БД (JDBC)
-        │       ├── dto/                 # DTO для запросов и ответов
-        │       ├── mapper/              # Мапперы моделей в DTO и обратно
-        │       ├── exception/           # Кастомные исключения
-        │       ├── util/                # Вспомогательные классы (JsonResponseWriter и т.п.)
-        │       └── db/                  # Подключение к БД (ConnectionProvider)
+        │       ├── controller/               # Сервлеты
+        │       ├── filter/                   # Фильтры
+        │       ├── config/                   # DatabaseLifecycleListener
+        │       ├── database/                 # Подключение к БД/пул
+        │       ├── dao/                      # DAO + JDBC-реализации
+        │       ├── service/                  # Бизнес-логика
+        │       ├── dto/                      # DTO запросов/ответов
+        │       ├── mapper/                   # MapStruct-мапперы
+        │       ├── model/                    # Доменные модели
+        │       ├── validation/               # Валидаторы
+        │       ├── exception/                # Кастомные исключения
+        │       └── webutil/                  # Утилиты веб-слоя
+        │           ├── request/              # RequestParamExtractor
+        │           └── response/             # ResponseWriter, JsonResponseWriter
+        │
         ├── resources/
-        │   └── db.properties            # Настройки подключения к SQLite
+        │   ├── db.properties                 # Настройки SQLite/HikariCP
+        │   └── logback.xml                   # Конфигурация Logback
+        │
         └── webapp/
-            ├── index.html               # Тестовый фронтенд
+            ├── index.html                    # Тестовый фронтенд
+            ├── css/                          # Стили фронта
             └── js/
-                └── app.js               # AJAX-запросы к REST API
+                └── app.js                    # AJAX-запросы к REST API
 ```
 
 (Фактическая структура может немного отличаться, см. репозиторий.)
